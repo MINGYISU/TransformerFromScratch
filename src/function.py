@@ -4,6 +4,8 @@ def gelu(x: torch.Tensor) -> torch.Tensor:
     return 0.5 * x * (1 + torch.tanh(torch.sqrt(torch.tensor(2, dtype=x.dtype) / torch.pi) * (x + 0.044715 * x**3)))
 
 def softmax(x: torch.Tensor) -> torch.Tensor:
+    """softmax()
+    """
     e_x = torch.exp(x - torch.max(x, dim=-1, keepdim=True).values)
     return e_x / torch.sum(e_x, dim=-1, keepdim=True)
 
@@ -77,15 +79,24 @@ def mha(
     out_heads = [attention(Q[:,i], K[:,i],V[:,i], mask=causal_mask) for i in range(num_heads)]
     x = torch.cat(out_heads, dim=-1)
 
-    # output projection, this doesn't change the shape
+    # output projection, this doesn't change the shape [N, embed size]
     return linear(x, Weight=W_out, bias=b_out)
 
-# def block(
-#         x: torch.Tensor, 
-#         mlp, 
-#         attn. 
-#         ln_1. 
-#         ln_2
-# ):
-#     # layer norm -> attention -> residual
-#     a = layer_norm(x, )
+def cross_entropy_loss(
+        logits: torch.Tensor, 
+        targets: torch.Tensor
+):
+    # log_probs = torch.log_softmax(logits, dim=-1)
+    # loss = -log_probs.gather(dim=-1, index=targets.unsqueeze(-1)).squeeze(-1)
+    # return loss.mean()
+    batch_size, num_classes = logits.shape
+    probs = softmax(logits)
+    mapping = {k: v for v, k in enumerate(torch.unique(targets, sorted=True))}
+    one_hot = torch.zeros(batch_size, num_classes)
+    one_hot[torch.arange(batch_size), targets] = 1.0
+
+    log_probs = torch.log(probs + 1e-10)
+    loss = -(one_hot * log_probs).sum(dim=-1)
+
+    loss = loss.mean()
+    return loss
