@@ -11,38 +11,67 @@ from .function import (
 )
 
 class Module(ABC):
-    """This is an abstract class used as a container to run the forward process when being called. 
-    It is for a simple demo only, and almost does nothing. 
+    """This is an abstract class used as a container to run the forward process when being called, automatically tracking parameters, and saving/loading the module. 
+    It is a simplified version of torch.nn.Module for educational purposes.
     Use torch.nn.Module in real production for more robust and efficient implementation. 
     """
     def __call__(self, x, *args, **kwargs):
         return self.forward(x, *args, **kwargs)
     
+    def class_name(self):
+        return self.__class__.__name__
+    
     @abstractmethod
     def _param_keys(self): raise NotImplementedError
 
-    def _get_attrs_reference(self):
-        """Return a list of direct references to the attributes listed in keys().
-        """
-        return {key: getattr(self, key) for key in self._param_keys()}.items()
+    @abstractmethod
+    def _configs(self): raise NotImplementedError
 
-    def class_name(self):
-        return self.__class__.__name__
+    def _get_attrs_reference(self):
+        """Return a dict of direct references to the param attributes listed in _param_keys().
+        """
+        # return {key: getattr(self, key) for key in self._param_keys()}.items()
+        for key in self._param_keys():
+            yield key, getattr(self, key)
 
     @abstractmethod
     def forward(self, x, *args, **kwargs): raise NotImplementedError
+
+    # def named_parameters(self):
+        # params = {}
+        # for name, ref in self._get_attrs_reference():
+        #     if isinstance(ref, Module):
+        #         params.update({f'{name}.{k}': v for k, v in ref.named_parameters().items()})
+        #     elif isinstance(ref, nn.Parameter):
+        #         params[name] = ref
+        # return params
+    
     
     def named_parameters(self):
-        params = {}
+        """Return a generator of all parameters in the module and its sub-modules.
+        Please override named_parameters() method for complex cases."""
+        # return {name: (ref if isinstance(ref, nn.Parameter) else ref.named_parameters()) 
+        #           for name, ref in self._get_attrs_reference()}
         for name, ref in self._get_attrs_reference():
-            if isinstance(ref, Module):
-                params.update({f'{name}.{k}': v for k, v in ref.named_parameters().items()})
-            elif isinstance(ref, nn.Parameter):
-                params[name] = ref
-        return params
+            if isinstance(ref, nn.Parameter):
+                yield name, ref
+            elif isinstance(ref, Module):
+                for k, v in ref.named_parameters():
+                    yield f'{name}.{k}', v
+    
+    # def parameters(self):
+        # params = []
+        # for ref in self._get_attrs_reference().values():
+        #     if isinstance(ref, nn.Parameter):
+        #         params.append(ref)
+        #     elif isinstance(ref, Module):
+        #         params.extend(ref.parameters())
+        # return params
 
     def parameters(self): 
-        return self.named_parameters().values()
+        """Return a generator of all parameters in the module and its sub-modules."""
+        for _, ref in self.named_parameters():
+            yield ref
     
     def save(self, filepath: str=None):
         """Save the module to a file using pickle.
@@ -60,7 +89,7 @@ class ModuleList(Module):
     """
     modules: list[Module]
 
-    def __init__(self, modules: list[Module]):
+    def __init__(self, modules: list[Module], *args, **kwargs):
         super().__init__()
         assert all(isinstance(m, Module) for m in modules), "ModuleList can only hold Module instances."
         unique_types = set(type(m) for m in modules)
@@ -74,6 +103,12 @@ class ModuleList(Module):
         elem_name = self.modules[0].class_name() if self.modules else "Module"
         return f'{self.__class__.__name__}[{elem_name}]'
 
+    def _configs(self):
+        params = {'length': len(self.modules)}
+        for i, module in enumerate(self.modules):
+            params.update({f'{module.class_name()}_{i}': module._configs()})
+        return params
+    
     def _param_keys(self):
         return [f'module_{i}' for i in range(len(self.modules))]
     
@@ -81,11 +116,16 @@ class ModuleList(Module):
         return {f'{m.class_name()}_{i}': m for i, m in enumerate(self.modules, start=1)}.items()
     
     def named_parameters(self):
-        params = {}
+        # params = {}
+        # for i, module in enumerate(self.modules, start=1):
+        #     sub_params = module.named_parameters()
+        #     params.update({f'{module.class_name()}_{i}.{k}': v for k, v in sub_params.items()})
+        # return params
+        # return {f'{module.class_name()}_{i}': module.named_parameters() 
+        #           for i, module in enumerate(self.modules, start=1)}
         for i, module in enumerate(self.modules, start=1):
-            sub_params = module.named_parameters()
-            params.update({f'{module.class_name()}_{i}.{k}': v for k, v in sub_params.items()})
-        return params
+            for sub_mod_name, sub_mod_ref in module.named_parameters():
+                yield f'{module.class_name()}_{i}.{sub_mod_name}', sub_mod_ref
 
     def forward(self, x):
         for module in self.modules:
@@ -110,7 +150,8 @@ class Linear(Module):
             self,
             in_features: int, 
             out_features: int, 
-            bias: bool=True):
+            bias: bool=True, 
+            *args, **kwargs):
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
@@ -119,9 +160,12 @@ class Linear(Module):
 
     def _param_keys(self):
         return ('W', 'b') if self.b is not None else ('W',)
+    
+    def _configs(self):
+        return {'in_features': self.in_features, 'out_features': self.out_features, 'bias': self.b is not None}
 
     def forward(self, x):
-        return linear(x, Weight=self.W, bias=self.b)
+        return linear(x, weight=self.W, bias=self.b)
     
     # def parameters(self):
     #     return [self.W, self.b] if self.b is not None else [self.W]
@@ -137,7 +181,8 @@ class LayerNorm(Module):
     def __init__(
             self,
             shape, 
-            eps: float=1e-5):
+            eps: float=1e-5, 
+            *args, **kwargs):
         super().__init__()
         self.shape = shape
         self.gamma = nn.Parameter(torch.ones(shape))
@@ -146,6 +191,9 @@ class LayerNorm(Module):
 
     def _param_keys(self):
         return 'gamma', 'beta'
+    
+    def _configs(self):
+        return {'shape': self.shape, 'eps': self.eps}
     
     def forward(self, x):
         return layer_norm(x, gamma=self.gamma, beta=self.beta, eps=self.eps)
@@ -161,7 +209,7 @@ class MultiHeadSelfAttention(Module):
     qkv_proj: Linear
     out_proj: Linear
 
-    def __init__(self, embed_dim, num_heads):
+    def __init__(self, embed_dim, num_heads, *args, **kwargs):
         super().__init__()
         assert embed_dim % num_heads == 0, f'Embed Size {embed_dim} cannot be divided by # of heads {num_heads} evenly!'
         self.embed_dim = embed_dim
@@ -171,6 +219,9 @@ class MultiHeadSelfAttention(Module):
 
     def _param_keys(self):
         return 'qkv_proj', 'out_proj'
+    
+    def _configs(self):
+        return {'embed_dim': self.embed_dim, 'num_heads': self.num_heads}
 
     def forward(self, x):
         return mha(x, 
@@ -189,13 +240,16 @@ class FeedForward(Module):
     fc1: Linear
     fc2: Linear
 
-    def __init__(self, embed_dim, hidden_dim):
+    def __init__(self, embed_dim, hidden_dim, *args, **kwargs):
         super().__init__()
         self.fc1 = Linear(embed_dim, hidden_dim)
         self.fc2 = Linear(hidden_dim, embed_dim)
 
     def _param_keys(self):
         return 'fc1', 'fc2'
+    
+    def _configs(self):
+        return {'embed_dim': self.fc1.in_features, 'hidden_dim': self.fc1.out_features}
 
     def forward(self, x):
         x = self.fc1(x)
@@ -207,7 +261,7 @@ class FeedForward(Module):
     #     return self.fc1.parameters() + self.fc2.parameters()
     
 class TransformerBlock(Module):
-    def __init__(self, embed_dim, num_heads, mlp_ratio=4.0):
+    def __init__(self, embed_dim, num_heads, *args, mlp_ratio=4.0, **kwargs):
         super().__init__()
         self.ln1 = LayerNorm(embed_dim)
         self.attn = MultiHeadSelfAttention(embed_dim=embed_dim, num_heads=num_heads)
@@ -224,6 +278,13 @@ class TransformerBlock(Module):
     
     def _param_keys(self):
         return 'ln1', 'attn', 'ln2', 'mlp'
+    
+    def _configs(self):
+        return {
+            'embed_dim': self.ln1.shape,
+            'num_heads': self.attn.num_heads,
+            'mlp_ratio': self.mlp.fc2.in_features / self.mlp.fc1.out_features
+        }
     
     # def parameters(self):
     #     params = []
