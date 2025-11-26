@@ -55,8 +55,6 @@ class Module(ABC):
     def named_parameters(self):
         """Return a generator of all parameters in the module and its sub-modules.
         Please override named_parameters() method for complex cases."""
-        # return {name: (ref if isinstance(ref, nn.Parameter) else ref.named_parameters()) 
-        #           for name, ref in self._get_attrs_reference()}
         for name, ref in self._get_attrs_reference():
             if isinstance(ref, Parameter):
                 yield name, ref
