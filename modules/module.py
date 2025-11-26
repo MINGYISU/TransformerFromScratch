@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+import os
+import json
 import warnings
 import pickle
 import torch
@@ -9,6 +11,13 @@ from .function import (
     mha, 
     gelu, 
 )
+
+class Parameter(nn.Parameter):
+    """A subclass of torch.nn.Parameter to represent parameters in our custom Module.
+    This is mainly for clarity and potential future extensions.
+    """
+    def configs(self):
+        return {'shape': self.shape, 'requires_grad': self.requires_grad}
 
 class Module(ABC):
     """This is an abstract class used as a container to run the forward process when being called, automatically tracking parameters, and saving/loading the module. 
@@ -25,13 +34,19 @@ class Module(ABC):
     def _param_keys(self): raise NotImplementedError
 
     @abstractmethod
-    def _configs(self): raise NotImplementedError
+    def _config_keys(self): 
+        return self._param_keys()
 
-    def _get_attrs_reference(self):
+    def configs(self): 
+        return {name: (ref.configs() if isinstance(ref, (Parameter, Module)) else ref)
+                for name, ref in self._get_attrs_reference(key_type='config')}
+
+    def _get_attrs_reference(self, key_type='param'):
         """Return a dict of direct references to the param attributes listed in _param_keys().
         """
         # return {key: getattr(self, key) for key in self._param_keys()}.items()
-        for key in self._param_keys():
+        keys = self._param_keys() if key_type == 'param' else self._config_keys()
+        for key in keys:
             yield key, getattr(self, key)
 
     @abstractmethod
@@ -53,7 +68,7 @@ class Module(ABC):
         # return {name: (ref if isinstance(ref, nn.Parameter) else ref.named_parameters()) 
         #           for name, ref in self._get_attrs_reference()}
         for name, ref in self._get_attrs_reference():
-            if isinstance(ref, nn.Parameter):
+            if isinstance(ref, Parameter):
                 yield name, ref
             elif isinstance(ref, Module):
                 for k, v in ref.named_parameters():
@@ -73,12 +88,23 @@ class Module(ABC):
         for _, ref in self.named_parameters():
             yield ref
     
-    def save(self, filepath: str=None):
+    def save(self, folder_path, file_name: str=None):
         """Save the module to a file using pickle.
         """
-        filepath = filepath if filepath is not None else f'{self.class_name()}.pkl'
-        with open(filepath, 'wb') as f:
+        os.makedirs(folder_path, exist_ok=True)
+        file_name = file_name if file_name is not None else f'{self.class_name()}.pkl'
+        with open(os.path.join(folder_path, file_name), 'wb') as f:
             pickle.dump(self, f)
+        with open(os.path.join(folder_path, f'{self.class_name()}_config.json'), 'w') as f:
+            json.dump(self.configs(), f, indent=4)
+
+    @classmethod
+    def load(cls, file_path):
+        """Load the module from a file using pickle.
+        """
+        with open(file_path, 'rb') as f:
+            loaded_module = pickle.load(f)
+        return loaded_module
 
 class ModuleList(Module):
     """This is a simple implementation of ModuleList that can hold a list of Modules and
@@ -102,11 +128,14 @@ class ModuleList(Module):
     def class_name(self):
         elem_name = self.modules[0].class_name() if self.modules else "Module"
         return f'{self.__class__.__name__}[{elem_name}]'
+    
+    def _config_keys(self):
+        return super()._config_keys()
 
-    def _configs(self):
+    def configs(self):
         params = {'length': len(self.modules)}
         for i, module in enumerate(self.modules):
-            params.update({f'{module.class_name()}_{i}': module._configs()})
+            params.update({f'{module.class_name()}_{i}': module.configs()})
         return params
     
     def _param_keys(self):
@@ -143,8 +172,8 @@ class Linear(Module):
     """
     in_features: int
     out_features: int
-    W: nn.Parameter
-    b: nn.Parameter | None
+    W: Parameter
+    b: Parameter | None
 
     def __init__(
             self,
@@ -155,14 +184,14 @@ class Linear(Module):
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
-        self.W = nn.Parameter(torch.randn(out_features, in_features))
-        self.b = nn.Parameter(torch.zeros(out_features)) if bias else None
+        self.W = Parameter(torch.randn(out_features, in_features))
+        self.b = Parameter(torch.zeros(out_features)) if bias else None
 
     def _param_keys(self):
         return ('W', 'b') if self.b is not None else ('W',)
     
-    def _configs(self):
-        return {'in_features': self.in_features, 'out_features': self.out_features, 'bias': self.b is not None}
+    def _config_keys(self):
+        return ('in_features', 'out_features') + self._param_keys()
 
     def forward(self, x):
         return linear(x, weight=self.W, bias=self.b)
@@ -174,8 +203,8 @@ class LayerNorm(Module):
     """
     """
     shape: int
-    gamma: nn.Parameter
-    beta: nn.Parameter
+    gamma: Parameter
+    beta: Parameter
     eps: float
     
     def __init__(
@@ -185,16 +214,16 @@ class LayerNorm(Module):
             *args, **kwargs):
         super().__init__()
         self.shape = shape
-        self.gamma = nn.Parameter(torch.ones(shape))
-        self.beta = nn.Parameter(torch.zeros(shape))
+        self.gamma = Parameter(torch.ones(shape))
+        self.beta = Parameter(torch.zeros(shape))
         self.eps = eps
 
     def _param_keys(self):
         return 'gamma', 'beta'
     
-    def _configs(self):
-        return {'shape': self.shape, 'eps': self.eps}
-    
+    def _config_keys(self):
+        return ('shape', 'eps') + self._param_keys()
+
     def forward(self, x):
         return layer_norm(x, gamma=self.gamma, beta=self.beta, eps=self.eps)
     
@@ -203,25 +232,31 @@ class LayerNorm(Module):
     
 class MultiHeadSelfAttention(Module):
     """
+    Args:
+        ...
+        padding_mask: torch.Tensor, mask to apply on the attention scores, if provided. 
+                       This is typically used to mask out padding tokens in the input.
     """
     embed_dim: int
     num_heads: int
     qkv_proj: Linear
     out_proj: Linear
+    padding_mask: torch.Tensor | None
 
-    def __init__(self, embed_dim, num_heads, *args, **kwargs):
+    def __init__(self, embed_dim, num_heads, padding_mask=None, *args, **kwargs):
         super().__init__()
         assert embed_dim % num_heads == 0, f'Embed Size {embed_dim} cannot be divided by # of heads {num_heads} evenly!'
         self.embed_dim = embed_dim
         self.num_heads = num_heads
         self.qkv_proj = Linear(embed_dim, embed_dim*3)
         self.out_proj = Linear(embed_dim, embed_dim)
+        self.padding_mask = padding_mask
 
     def _param_keys(self):
         return 'qkv_proj', 'out_proj'
     
-    def _configs(self):
-        return {'embed_dim': self.embed_dim, 'num_heads': self.num_heads}
+    def _config_keys(self):
+        return ('embed_dim', 'num_heads') + self._param_keys()
 
     def forward(self, x):
         return mha(x, 
@@ -237,19 +272,23 @@ class MultiHeadSelfAttention(Module):
 class FeedForward(Module):
     """
     """
+    embed_dim: int
+    hidden_dim: int
     fc1: Linear
     fc2: Linear
 
     def __init__(self, embed_dim, hidden_dim, *args, **kwargs):
         super().__init__()
+        self.embed_dim = embed_dim
+        self.hidden_dim = hidden_dim
         self.fc1 = Linear(embed_dim, hidden_dim)
         self.fc2 = Linear(hidden_dim, embed_dim)
 
     def _param_keys(self):
         return 'fc1', 'fc2'
     
-    def _configs(self):
-        return {'embed_dim': self.fc1.in_features, 'hidden_dim': self.fc1.out_features}
+    def _config_keys(self):
+        return ('embed_dim', 'hidden_dim') + self._param_keys()
 
     def forward(self, x):
         x = self.fc1(x)
@@ -261,8 +300,19 @@ class FeedForward(Module):
     #     return self.fc1.parameters() + self.fc2.parameters()
     
 class TransformerBlock(Module):
+    embed_dim: int
+    num_heads: int
+    mlp_ratio: float
+    ln1: LayerNorm
+    attn: MultiHeadSelfAttention
+    ln2: LayerNorm
+    mlp: FeedForward
+
     def __init__(self, embed_dim, num_heads, *args, mlp_ratio=4.0, **kwargs):
         super().__init__()
+        self.embed_dim = embed_dim
+        self.num_heads = num_heads
+        self.mlp_ratio = mlp_ratio
         self.ln1 = LayerNorm(embed_dim)
         self.attn = MultiHeadSelfAttention(embed_dim=embed_dim, num_heads=num_heads)
         self.ln2 = LayerNorm(embed_dim)
@@ -279,12 +329,8 @@ class TransformerBlock(Module):
     def _param_keys(self):
         return 'ln1', 'attn', 'ln2', 'mlp'
     
-    def _configs(self):
-        return {
-            'embed_dim': self.ln1.shape,
-            'num_heads': self.attn.num_heads,
-            'mlp_ratio': self.mlp.fc2.in_features / self.mlp.fc1.out_features
-        }
+    def _config_keys(self):
+        return ('embed_dim', 'num_heads', 'mlp_ratio') + self._param_keys()
     
     # def parameters(self):
     #     params = []

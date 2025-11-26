@@ -59,10 +59,12 @@ def attention(
 def mha(
         x: torch.Tensor, 
         W_qkv: torch.Tensor, b_qkv: torch.Tensor, 
-        W_out: torch.Tensor, b_out: torch.Tensor, 
-        num_heads: int
+        W_out: torch.Tensor, b_out: torch.Tensor,
+        num_heads: int, 
+        padding_mask: torch.Tensor=None,
 ) -> torch.Tensor:
     """Multi-Head Self-Attention
+    Padding mask is not implemented yet in the function body. 
     Terminologies:
         B: batch size
         T: sequence length

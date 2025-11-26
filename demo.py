@@ -1,17 +1,23 @@
-from modules.model import MyGPT
-# from modules.function import cross_entropy_loss
+from models.example.model import MyGPT
 import torch
 
 def main():
-    x = torch.randint(0, 100, (1, 4))
-    targets = torch.randn(1, 4)
-    model = MyGPT(vocab_size=100, max_seq_length=100, embed_dim=10, num_layers=2, num_heads=2)
-    print(*(f'{k}: {v.shape}' for k, v in model.named_parameters()), sep='\n')
-    logits = model(x)
-    # loss = cross_entropy_loss(logits, targets)
-    logits.mean().backward()
-    # for param in model.parameters():
-    #     print(param.grad.shape)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = MyGPT(vocab_size=model.tokenizer.vocab_size(), max_seq_length=100, embed_dim=10, num_layers=2, num_heads=2).to(device)
+    model = model.load('models/saved_models/MyGPT.pkl')
+
+    input = ['a', 'ap', 'app', 'appl', 'apple', 'b', 'ba', 'ban', 'bana', 'banan', 'banana']
+    input_ids, mask = model.tokenizer.tokenize(input)
+    print(input_ids)
+
+    output_id = model.generate(input_ids=input_ids.to(device), max_new_tokens=20, eos_token_id=model.tokenizer.vocabulary['<EOS>'])
+    decoded = model.tokenizer.decode(output_id.tolist())
+    for inp, out in zip(input, decoded):
+        print(f"Input: {inp}")
+        print(f"Output: {out} ✅ {len(out)} characters generated")
+        print('-'*50)
 
 if __name__ == '__main__':
+    import sys
+    sys.path.insert(0, '.')
     main()
