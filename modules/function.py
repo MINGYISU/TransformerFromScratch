@@ -5,7 +5,7 @@ def gelu(x: torch.Tensor) -> torch.Tensor:
     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
 
 def softmax(x: torch.Tensor) -> torch.Tensor:
-    """softmax()
+    """softmax() function along the last dimension
     """
     e_x = torch.exp(x - torch.max(x, dim=-1, keepdim=True).values)
     return e_x / torch.sum(e_x, dim=-1, keepdim=True)
@@ -16,6 +16,15 @@ def layer_norm(
         beta: torch.Tensor, 
         eps: float=1e-5
 ) -> torch.Tensor:
+    """Layer Normalization
+    Args:
+        x: torch.Tensor of shape [..., features]
+        gamma: torch.Tensor of shape [features]
+        beta: torch.Tensor of shape [features]
+        eps: float, small value to avoid division by zero
+    Returns:
+        torch.Tensor of same shape as x
+    """
     mean = torch.mean(x, dim=-1, keepdim=True)
     var = torch.var(x, dim=-1, keepdim=True, unbiased=False)
     # use reciprocal sqrt for numerical stability and clarity
@@ -27,6 +36,14 @@ def linear(
         weight: torch.Tensor, 
         bias: torch.Tensor=None
 ) -> torch.Tensor:
+    """Linear transformation: Wx + b
+    Args:
+        x: torch.Tensor of shape [..., in_features]
+        weight: torch.Tensor of shape [out_features, in_features]
+        bias: torch.Tensor of shape [out_features] or None
+    Returns:
+        torch.Tensor of shape [..., out_features]
+    """
     out = x @ weight.T
     return out + bias if bias is not None else out
 
@@ -35,6 +52,16 @@ def ffn(
         W1: torch.Tensor, b1: torch.Tensor, 
         W2: torch.Tensor, b2: torch.Tensor
 ) -> torch.Tensor:
+    """Feed-Forward Network with GELU activation: (GELU(xW1 + b1))W2 + b2
+    Args:
+        x: torch.Tensor of shape [batch size, sequence length, embed_dim]
+        W1: Weights of first layer, shape [hidden_dim, embed_dim]
+        b1: bias of first layer, shape [hidden_dim]
+        W2: weights of second layer, shape [embed_dim, hidden_dim]
+        b2: bias of second layer, shape [embed_dim]
+    Returns:
+        torch.Tensor of shape [batch size, sequence length, embed_dim]
+    """
     return linear(gelu(linear(x, weight=W1, bias=b1)), weight=W2, bias=b2)
 
 def attention(
@@ -43,6 +70,7 @@ def attention(
         V: torch.Tensor, 
         mask: torch.Tensor=None
 ) -> torch.Tensor:
+    """Attention is all you need. """
     d_k = Q.shape[-1]
 
     # raw query attention scores (what to attend)

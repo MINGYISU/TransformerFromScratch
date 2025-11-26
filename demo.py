@@ -3,7 +3,7 @@ import torch
 
 def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = MyGPT(vocab_size=model.tokenizer.vocab_size(), max_seq_length=100, embed_dim=10, num_layers=2, num_heads=2).to(device)
+    model = MyGPT(max_seq_length=100, embed_dim=10, num_layers=2, num_heads=2).to(device)
     model = model.load('models/saved_models/MyGPT.pkl')
 
     input = ['a', 'ap', 'app', 'appl', 'apple', 'b', 'ba', 'ban', 'bana', 'banan', 'banana']

@@ -29,12 +29,12 @@ class MyGPT(Module):
                  **kwargs):
         super().__init__()
         self.tokenizer = MyGptTokenizer()
-        self.vocab_size = vocab_size
+        self.vocab_size = self.tokenizer.vocab_size()
         self.max_seq_length = max_seq_length
         self.embed_dim = embed_dim
         self.num_layers = num_layers
         self.num_heads = num_heads
-        self.token_embed = Parameter(torch.randn(vocab_size, embed_dim))
+        self.token_embed = Parameter(torch.randn(self.vocab_size, embed_dim))
         # positional embedding vocabulary: [max_seq_length, embed_dim]
         self.pos_embed = Parameter(torch.randn(max_seq_length, embed_dim))
         self.blocks = ModuleList([TransformerBlock(embed_dim=embed_dim, num_heads=num_heads, *args, **kwargs) 

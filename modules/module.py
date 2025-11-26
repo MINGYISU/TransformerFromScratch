@@ -51,16 +51,6 @@ class Module(ABC):
 
     @abstractmethod
     def forward(self, x, *args, **kwargs): raise NotImplementedError
-
-    # def named_parameters(self):
-        # params = {}
-        # for name, ref in self._get_attrs_reference():
-        #     if isinstance(ref, Module):
-        #         params.update({f'{name}.{k}': v for k, v in ref.named_parameters().items()})
-        #     elif isinstance(ref, nn.Parameter):
-        #         params[name] = ref
-        # return params
-    
     
     def named_parameters(self):
         """Return a generator of all parameters in the module and its sub-modules.
@@ -73,15 +63,6 @@ class Module(ABC):
             elif isinstance(ref, Module):
                 for k, v in ref.named_parameters():
                     yield f'{name}.{k}', v
-    
-    # def parameters(self):
-        # params = []
-        # for ref in self._get_attrs_reference().values():
-        #     if isinstance(ref, nn.Parameter):
-        #         params.append(ref)
-        #     elif isinstance(ref, Module):
-        #         params.extend(ref.parameters())
-        # return params
 
     def parameters(self): 
         """Return a generator of all parameters in the module and its sub-modules."""
@@ -145,13 +126,6 @@ class ModuleList(Module):
         return {f'{m.class_name()}_{i}': m for i, m in enumerate(self.modules, start=1)}.items()
     
     def named_parameters(self):
-        # params = {}
-        # for i, module in enumerate(self.modules, start=1):
-        #     sub_params = module.named_parameters()
-        #     params.update({f'{module.class_name()}_{i}.{k}': v for k, v in sub_params.items()})
-        # return params
-        # return {f'{module.class_name()}_{i}': module.named_parameters() 
-        #           for i, module in enumerate(self.modules, start=1)}
         for i, module in enumerate(self.modules, start=1):
             for sub_mod_name, sub_mod_ref in module.named_parameters():
                 yield f'{module.class_name()}_{i}.{sub_mod_name}', sub_mod_ref
@@ -160,15 +134,9 @@ class ModuleList(Module):
         for module in self.modules:
             x = module(x)
         return x
-    
-    # def parameters(self):
-    #     params = []
-    #     for module in self.modules:
-    #         params.extend(module.parameters())
-    #     return params
 
 class Linear(Module):
-    """
+    """Linear layer wrapper
     """
     in_features: int
     out_features: int
@@ -196,11 +164,8 @@ class Linear(Module):
     def forward(self, x):
         return linear(x, weight=self.W, bias=self.b)
     
-    # def parameters(self):
-    #     return [self.W, self.b] if self.b is not None else [self.W]
-    
 class LayerNorm(Module):
-    """
+    """Wrapper for Layer Normalization
     """
     shape: int
     gamma: Parameter
@@ -226,9 +191,6 @@ class LayerNorm(Module):
 
     def forward(self, x):
         return layer_norm(x, gamma=self.gamma, beta=self.beta, eps=self.eps)
-    
-    # def parameters(self):
-    #     return [self.gamma, self.beta]
     
 class MultiHeadSelfAttention(Module):
     """
@@ -266,11 +228,8 @@ class MultiHeadSelfAttention(Module):
                      b_out=self.out_proj.b, 
                      num_heads=self.num_heads)
     
-    # def parameters(self):
-    #     return self.qkv_proj.parameters() + self.out_proj.parameters()
-    
 class FeedForward(Module):
-    """
+    """Wrapper for feed forward nn
     """
     embed_dim: int
     hidden_dim: int
@@ -296,10 +255,8 @@ class FeedForward(Module):
         x = self.fc2(x)
         return x
     
-    # def parameters(self):
-    #     return self.fc1.parameters() + self.fc2.parameters()
-    
 class TransformerBlock(Module):
+    """A complete transformer (decoder-only) block."""
     embed_dim: int
     num_heads: int
     mlp_ratio: float
@@ -319,11 +276,11 @@ class TransformerBlock(Module):
         self.mlp = FeedForward(embed_dim=embed_dim, hidden_dim=int(embed_dim*mlp_ratio))
 
     def forward(self, x):
-        attn_out = self.attn(self.ln1(x))
-        x = x + attn_out
+        attn_out = self.attn(self.ln1(x)) # attention score
+        x = x + attn_out # residual connection
 
-        mlp_out = self.mlp(self.ln2(x))
-        x = x + mlp_out
+        mlp_out = self.mlp(self.ln2(x)) # feed-forward output
+        x = x + mlp_out # residual connection
         return x
     
     def _param_keys(self):
@@ -332,8 +289,3 @@ class TransformerBlock(Module):
     def _config_keys(self):
         return ('embed_dim', 'num_heads', 'mlp_ratio') + self._param_keys()
     
-    # def parameters(self):
-    #     params = []
-    #     for layer in self.keys():
-    #         params.extend(getattr(self, layer).parameters())
-    #     return params
