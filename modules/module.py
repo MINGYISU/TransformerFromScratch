@@ -104,6 +104,10 @@ class ModuleList(Module):
                         "It is recommended to use separate ModuleLists for different types of modules for better readability.")
         self.modules = modules
 
+    def _get_modules(self):
+        for module in self.modules:
+            yield module
+
     def class_name(self):
         elem_name = self.modules[0].class_name() if self.modules else "Module"
         return f'{self.__class__.__name__}[{elem_name}]'
@@ -129,7 +133,7 @@ class ModuleList(Module):
                 yield f'{module.class_name()}_{i}.{sub_mod_name}', sub_mod_ref
 
     def forward(self, x):
-        for module in self.modules:
+        for module in self._get_modules():
             x = module(x)
         return x
 
