@@ -6,7 +6,7 @@
 ## Intuition
 
 **Feed-forward (FFN / MLP).** Attention moves information *between* tokens. The FFN then processes
-each token *alone*: grow the vector 4× wider, apply [GELU](04_activations.md), shrink it back.
+each token *alone*: grow the vector 4× wider, apply [GELU](06_activations.md), shrink it back.
 
 ```
 [E] --Linear--> [4E] --GELU--> [4E] --Linear--> [E]

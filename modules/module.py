@@ -161,7 +161,7 @@ class Linear(Module):
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
-        # scale by 1/sqrt(in_features) so outputs keep roughly unit variance (see lessons/03_linear_layer.md)
+        # scale by 1/sqrt(in_features) so outputs keep roughly unit variance (see lessons/05_linear_layer.md)
         self.W = Parameter(torch.randn(out_features, in_features) / math.sqrt(in_features))
         self.b = Parameter(torch.zeros(out_features)) if bias else None
 

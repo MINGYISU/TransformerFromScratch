@@ -15,6 +15,13 @@ A model outputs raw scores ("logits") like `[2.0, 1.0, 0.1]`. To read them as
 softmax(xᵢ) = exp(xᵢ) / Σⱼ exp(xⱼ)
 ```
 
+By hand, for `[2.0, 1.0, 0.1]`:
+
+```
+exp:      [7.39, 2.72, 1.11]      total = 11.21
+divide:   [7.39/11.21, 2.72/11.21, 1.11/11.21]  =  [0.66, 0.24, 0.10]
+```
+
 GPT uses softmax twice: to turn attention scores into weights (lesson 16), and to turn the
 final logits into "probability of each next token" (lesson 24).
 
@@ -71,5 +78,5 @@ print(softmax(big))   # tensor([0.2689, 0.7311])
 </details>
 
 ---
-[Course map](../README.md) · Prev: [04](04_activations.md) · Next: [13 · Tokenizer](13_tokenizer.md)
+[Course map](../README.md) · Prev: [06](06_activations.md) · Next: [13 · Tokenizer](13_tokenizer.md)
 *(lessons 09–12 are coming soon)*

@@ -46,3 +46,20 @@ def test_linear_init_keeps_variance():
     torch.manual_seed(0)
     out = Linear(512, 512)(torch.randn(1000, 512))
     assert 0.8 < out.std().item() < 1.2
+
+def test_mse():
+    from modules.loss import mse
+    a, b = torch.randn(10), torch.randn(10)
+    assert torch.allclose(mse(a, b), F.mse_loss(a, b))
+
+def test_sgd_matches_torch():
+    from modules.optim import SGD
+    w1 = torch.randn(5, requires_grad=True)
+    w2 = w1.detach().clone().requires_grad_(True)
+    ours, ref = SGD([w1], lr=0.1), torch.optim.SGD([w2], lr=0.1)
+    for opt, w in ((ours, w1), (ref, w2)):
+        for _ in range(3):
+            opt.zero_grad()
+            (w ** 2).sum().backward()
+            opt.step()
+    assert torch.allclose(w1, w2)

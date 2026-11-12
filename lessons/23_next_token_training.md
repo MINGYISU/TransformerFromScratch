@@ -20,9 +20,9 @@ each position can't peek at its own answer.
 The training loop is always the same four steps:
 
 1. **forward**: `logits = model(input)` → `[B, T, V]`
-2. **loss**: how wrong were we? (cross-entropy, lesson 09)
-3. **backward**: `loss.backward()` computes every gradient ([autograd](02_autograd.md))
-4. **step**: nudge every weight against its gradient (optimizer, lessons 06 & 11)
+2. **loss**: how wrong were we? ([loss](03_loss.md); for tokens we use cross-entropy, lesson 09)
+3. **backward**: `loss.backward()` computes every gradient ([gradients](02_gradients.md))
+4. **step**: nudge every weight against its gradient ([gradient descent](04_gradient_descent.md); we use its smarter cousin Adam, lesson 11)
 
 ## Code
 

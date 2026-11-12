@@ -5,7 +5,7 @@
 
 ## Intuition
 
-Each token makes three vectors (each is a [linear layer](03_linear_layer.md) of the token):
+Each token makes three vectors (each is a [linear layer](05_linear_layer.md) of the token):
 
 | Vector | Question it answers |
 |---|---|
