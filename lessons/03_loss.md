@@ -84,7 +84,7 @@ print(loss.item(), guess.grad.item())       # 9.0, 6.0 → positive slope, so gu
 - **Mean Absolute Error** $\lvert \text{guess} - 3 \rvert$ also works, but punishes big mistakes less, and its slope
   jumps suddenly at the minimum.
 - MSE is for predicting **numbers**. An LLM picks a **token out of many**, which needs a different loss:
-  **cross-entropy** (lesson 09). The idea is the same: one number, smaller is better.
+  **[cross-entropy](09_cross_entropy.md)** (lesson 09). The idea is the same: one number, smaller is better.
 </details>
 
 ---

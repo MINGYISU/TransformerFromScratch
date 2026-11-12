@@ -86,5 +86,4 @@ print(softmax(big))   # tensor([0.2689, 0.7311])
 </details>
 
 ---
-[Course map](../README.md) · Prev: [06](06_activations.md) · Next: [13 · Tokenizer](13_tokenizer.md)
-*(lessons 09–12 are coming soon)*
+[Course map](../README.md) · Prev: [07](07_first_neural_network.md) · Next: [09 · Cross-entropy](09_cross_entropy.md)

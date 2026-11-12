@@ -1,11 +1,14 @@
 """Regenerate the figures used in the lessons:  pip install matplotlib && python lessons/figures/make_figures.py"""
 import math
 import pathlib
+import sys
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 OUT = pathlib.Path(__file__).parent
+sys.path.insert(0, str(OUT.parent.parent))   # repo root, so we can import our own modules
+import torch
 plt.rcParams.update({'font.size': 12, 'axes.spines.top': False, 'axes.spines.right': False})
 
 def save(fig, name):
@@ -83,4 +86,58 @@ ax.plot(x, [max(0.0, v) for v in x], label='ReLU', lw=2)
 ax.plot(x, [v * 0.5 * (1 + math.erf(v / math.sqrt(2))) for v in x], label='GELU', lw=2, ls='--')
 ax.axhline(0, color='lightgray', lw=1); ax.set_xlabel('input'); ax.set_ylabel('output'); ax.legend()
 save(fig, '06_activations.png')
+# 07: XOR — no single line separates the classes; a small network bends the boundary
+from models.mlp.xor import train as train_xor, X as XOR_X, Y as XOR_Y
+fig, axes = plt.subplots(1, 2, figsize=(9, 4))
+for ax in axes:
+    for (x1, x2), y in zip(XOR_X.tolist(), XOR_Y.squeeze().tolist()):
+        ax.scatter(x1, x2, s=250, c='tab:orange' if y else 'tab:blue', edgecolors='black', zorder=3)
+        ax.annotate(f'XOR = {int(y)}', (x1, x2), textcoords='offset points', xytext=(0, 14), ha='center')
+    ax.set_xlim(-0.5, 1.5); ax.set_ylim(-0.5, 1.6); ax.set_xlabel('x1'); ax.set_ylabel('x2'); ax.set_aspect('equal')
+axes[0].plot([-0.5, 1.5], [1.2, -0.3], '--', color='gray'); axes[0].set_title('a straight line always gets one wrong')
+xor_net = train_xor(verbose=False)
+g = torch.linspace(-0.5, 1.6, 120)
+gx, gy = torch.meshgrid(g, g, indexing='xy')
+with torch.no_grad():
+    z = xor_net(torch.stack([gx.flatten(), gy.flatten()], dim=-1)).reshape(gx.shape)
+axes[1].contourf(gx, gy, z > 0.5, levels=[-0.5, 0.5, 1.5], colors=['#cfe0f3', '#fde0c5'])
+axes[1].set_title('a tiny network learns a bent boundary')
+save(fig, '07_xor.png')
+
+# 09: cross-entropy = -log(p of the correct answer)
+fig, ax = plt.subplots(figsize=(6, 4))
+p = xs(0.01, 1.0)
+ax.plot(p, [-math.log(v) for v in p], color='black')
+for pv, color in [(0.9, 'tab:green'), (0.5, 'tab:orange'), (0.05, 'tab:red')]:
+    ax.plot([pv], [-math.log(pv)], 'o', ms=9, color=color, label=f'p = {pv} → loss = {-math.log(pv):.2f}')
+ax.set_xlabel('probability the model gave to the correct answer'); ax.set_ylabel('loss = −log p'); ax.legend()
+save(fig, '09_cross_entropy.png')
+
+# 11: paths of SGD, momentum and Adam on a long, narrow valley f(x, y) = 0.05 x² + y²
+from modules.optim import SGD, Adam
+def valley(w): return 0.05 * w[0] ** 2 + w[1] ** 2
+fig, ax = plt.subplots(figsize=(8, 4))
+gx, gy = torch.meshgrid(torch.linspace(-5.5, 1, 100), torch.linspace(-2.2, 2.2, 100), indexing='xy')
+ax.contour(gx, gy, 0.05 * gx ** 2 + gy ** 2, levels=15, colors='lightgray')
+for name, make, color in [('SGD', lambda p: SGD(p, lr=0.9), 'tab:red'),
+                          ('SGD + momentum', lambda p: SGD(p, lr=0.3, momentum=0.7), 'tab:blue'),
+                          ('Adam', lambda p: Adam(p, lr=0.2), 'tab:green')]:
+    w = torch.tensor([-5.0, 2.0], requires_grad=True)
+    opt, path = make([w]), [w.detach().clone()]
+    for _ in range(25):
+        opt.zero_grad(); valley(w).backward(); opt.step(); path.append(w.detach().clone())
+    path = torch.stack(path)
+    ax.plot(path[:, 0], path[:, 1], 'o-', ms=3, color=color, label=name)
+ax.plot([0], [0], '*', ms=15, color='black', label='minimum')
+ax.set_xlabel('x'); ax.set_ylabel('y'); ax.set_title('25 steps on a long, narrow valley'); ax.legend(loc='lower right')
+save(fig, '11_optimizers.png')
+
+# 12: warmup + cosine learning-rate schedule
+from modules.optim import warmup_cosine_lr
+fig, ax = plt.subplots(figsize=(6, 3.5))
+steps = list(range(2000))
+ax.plot(steps, [warmup_cosine_lr(s, 3e-3, 100, 2000, 3e-4) for s in steps], color='tab:blue')
+ax.axvspan(0, 100, color='tab:orange', alpha=0.2, label='warmup')
+ax.set_xlabel('training step'); ax.set_ylabel('learning rate'); ax.legend()
+save(fig, '12_lr_schedule.png')
 print('figures written to', OUT)

@@ -97,4 +97,4 @@ print(torch.zeros_like(probs).scatter(-1, order, sorted_probs / sorted_probs.sum
 </details>
 
 ---
-[Course map](../README.md) · Prev: [23](23_next_token_training.md)
+[Course map](../README.md) · Prev: [23](23_next_token_training.md) · Next: [25 · Training it end to end](25_train_end_to_end.md)

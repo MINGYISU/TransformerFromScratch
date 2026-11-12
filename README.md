@@ -35,6 +35,7 @@ The finished model learns to spell fruit names: give it `ba` and it writes `bana
 
 ```bash
 pip install -r requirements.txt
+python -m models.mlp.xor          # a tiny network learns XOR (lesson 07)
 python -m models.example.train    # train the tiny GPT (a few seconds on CPU)
 python demo.py                    # 'ba' -> banana, 'gr' -> grape, ...
 python -m pytest                  # check our code against PyTorch + run every lesson
@@ -45,61 +46,59 @@ To run a lesson's code yourself, paste its `python` blocks in order into `python
 
 ## Course map
 
-✅ = ready · 🚧 = coming soon
-
 ### Part 0 · The big picture
 | # | Lesson | Idea |
 |---|---|---|
-| 00 | ✅ [What is a transformer?](lessons/00_what_is_a_transformer.md) | an LLM guesses the next token; what's inside; how it learns |
+| 00 | [What is a transformer?](lessons/00_what_is_a_transformer.md) | an LLM guesses the next token; what's inside; how it learns |
 
 ### Part 1 · The math tools
 | # | Lesson | Idea |
 |---|---|---|
-| 01 | ✅ [Tensors](lessons/01_tensors.md) | scalars, vectors, matrices; the dot product |
-| 02 | ✅ [Gradients](lessons/02_gradients.md) | the slope of $x^2$, and which way is downhill |
-| 03 | ✅ [Loss](lessons/03_loss.md) | one number for "how wrong", and why we want its minimum |
-| 04 | ✅ [Gradient descent](lessons/04_gradient_descent.md) | walk downhill to the minimum, step by step |
+| 01 | [Tensors](lessons/01_tensors.md) | scalars, vectors, matrices; the dot product |
+| 02 | [Gradients](lessons/02_gradients.md) | the slope of $x^2$, and which way is downhill |
+| 03 | [Loss](lessons/03_loss.md) | one number for "how wrong", and why we want its minimum |
+| 04 | [Gradient descent](lessons/04_gradient_descent.md) | walk downhill to the minimum, step by step |
 
 ### Part 2 · Neural networks
 | # | Lesson | Idea |
 |---|---|---|
-| 05 | ✅ [Linear layer](lessons/05_linear_layer.md) | a neuron = weighted sum + bias |
-| 06 | ✅ [Activations](lessons/06_activations.md) | ReLU, GELU: bending straight lines |
-| 07 | 🚧 Your first neural network | a tiny network learns XOR |
+| 05 | [Linear layer](lessons/05_linear_layer.md) | a neuron = weighted sum + bias |
+| 06 | [Activations](lessons/06_activations.md) | ReLU, GELU: bending straight lines |
+| 07 | [Your first neural network](lessons/07_first_neural_network.md) | a tiny network learns XOR |
 
 ### Part 3 · Choosing among options
 | # | Lesson | Idea |
 |---|---|---|
-| 08 | ✅ [Softmax](lessons/08_softmax.md) | scores → probabilities |
-| 09 | 🚧 Cross-entropy loss | $-\log p(\text{correct answer})$ |
-| 10 | 🚧 Metrics | accuracy, perplexity |
-| 11 | 🚧 Momentum and Adam | smarter steps than plain SGD |
-| 12 | 🚧 Training tricks | lr warmup/decay, gradient clipping, dropout |
+| 08 | [Softmax](lessons/08_softmax.md) | scores → probabilities |
+| 09 | [Cross-entropy loss](lessons/09_cross_entropy.md) | $-\log p(\text{correct answer})$ |
+| 10 | [Metrics](lessons/10_metrics.md) | accuracy, perplexity, precision/recall/F1, hit@k, MRR, nDCG |
+| 11 | [Momentum and Adam](lessons/11_momentum_and_adam.md) | smarter steps than plain SGD; AdamW |
+| 12 | [Training tricks](lessons/12_training_tricks.md) | lr warmup/decay, gradient clipping, dropout |
 
 ### Part 4 · Text → numbers
 | # | Lesson | Idea |
 |---|---|---|
-| 13 | ✅ [Tokenizer](lessons/13_tokenizer.md) | characters → ids, padding, `<EOS>` |
-| 14 | ✅ [Token embeddings](lessons/14_token_embeddings.md) | a learnable vector per token |
-| 15 | ✅ [Positional embeddings](lessons/15_positional_embeddings.md) | telling the model *where* each token is |
+| 13 | [Tokenizer](lessons/13_tokenizer.md) | characters → ids, padding, `<EOS>` |
+| 14 | [Token embeddings](lessons/14_token_embeddings.md) | a learnable vector per token |
+| 15 | [Positional embeddings](lessons/15_positional_embeddings.md) | telling the model *where* each token is |
 
 ### Part 5 · The transformer
 | # | Lesson | Idea |
 |---|---|---|
-| 16 | ✅ [Attention](lessons/16_attention.md) | $\text{softmax}(QK^\top / \sqrt{d}) V$ |
-| 17 | ✅ [Masks](lessons/17_masks.md) | no peeking at the future |
-| 18 | ✅ [Multi-head attention](lessons/18_multi_head_attention.md) | several attentions side by side |
-| 19 | ✅ [LayerNorm](lessons/19_layer_norm.md) | keeping numbers in a healthy range |
-| 20 | ✅ [Residuals and feed-forward](lessons/20_residual_and_feed_forward.md) | $x + f(x)$ |
-| 21 | ✅ [The transformer block](lessons/21_transformer_block.md) | putting 16–20 together |
+| 16 | [Attention](lessons/16_attention.md) | $\text{softmax}(QK^\top / \sqrt{d}) V$ |
+| 17 | [Masks](lessons/17_masks.md) | no peeking at the future |
+| 18 | [Multi-head attention](lessons/18_multi_head_attention.md) | several attentions side by side |
+| 19 | [LayerNorm](lessons/19_layer_norm.md) | keeping numbers in a healthy range |
+| 20 | [Residuals and feed-forward](lessons/20_residual_and_feed_forward.md) | $x + f(x)$ |
+| 21 | [The transformer block](lessons/21_transformer_block.md) | putting 16–20 together |
 
 ### Part 6 · The language model
 | # | Lesson | Idea |
 |---|---|---|
-| 22 | ✅ [Assembling GPT](lessons/22_assemble_gpt.md) | embeddings → blocks → logits |
-| 23 | ✅ [Next-token training](lessons/23_next_token_training.md) | target = input shifted by one |
-| 24 | ✅ [Generating text](lessons/24_generation.md) | sample, append, repeat |
-| 25 | 🚧 Train it end to end | loss curves, perplexity, saving and loading |
+| 22 | [Assembling GPT](lessons/22_assemble_gpt.md) | embeddings → blocks → logits |
+| 23 | [Next-token training](lessons/23_next_token_training.md) | target = input shifted by one |
+| 24 | [Generating text](lessons/24_generation.md) | sample, append, repeat |
+| 25 | [Training it end to end](lessons/25_train_end_to_end.md) | the full loop, reading the log, evaluating, saving and loading |
 
 ## Project structure
 
@@ -107,14 +106,17 @@ To run a lesson's code yourself, paste its `python` blocks in order into `python
 lessons/              the course, one markdown file per lesson
   figures/            plots used in the lessons (+ make_figures.py to redraw them)
 modules/
-  function.py         the math as plain functions: gelu, softmax, linear, layer_norm, attention, mha
+  function.py         the math as plain functions: relu, gelu, softmax, log_softmax, dropout, linear, layer_norm, attention, mha
   module.py           classes that hold weights: Module, Parameter, Linear, LayerNorm, attention, block
-  loss.py             mse (cross-entropy coming soon)
-  optim.py            SGD (Adam coming soon)
+  loss.py             mse, cross_entropy (with ignore_index and label smoothing)
+  optim.py            SGD (+ momentum), Adam, AdamW, warmup_cosine_lr, clip_grad_norm
+  metrics.py          accuracy, perplexity, precision, recall, f1, hit_at_k, mrr, ndcg_at_k
+models/mlp/
+  xor.py              the smallest interesting network: learns XOR
 models/example/
   tokenizer.py        character-level tokenizer
   model.py            MyGPT: the full model + text generation
-  train.py            next-token training on fruit names
+  train.py            next-token training on fruit names (AdamW, lr schedule, clipping, metrics)
 demo.py               generate fruit names with the trained model
 tests/                our code vs PyTorch's, plus a runner for every lesson
 ```

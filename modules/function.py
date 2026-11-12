@@ -1,6 +1,10 @@
 import torch
 import math
 
+def relu(x: torch.Tensor) -> torch.Tensor:
+    """max(0, x): keep positives, zero out negatives"""
+    return torch.clamp(x, min=0)
+
 def gelu(x: torch.Tensor) -> torch.Tensor:
     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
 
@@ -9,6 +13,22 @@ def softmax(x: torch.Tensor) -> torch.Tensor:
     """
     e_x = torch.exp(x - torch.max(x, dim=-1, keepdim=True).values)
     return e_x / torch.sum(e_x, dim=-1, keepdim=True)
+
+def log_softmax(x: torch.Tensor) -> torch.Tensor:
+    """log(softmax(x)) along the last dimension, computed without ever taking log(0):
+    log(e^x_i / sum_j e^x_j) = x_i - log(sum_j e^x_j)
+    """
+    x = x - torch.max(x, dim=-1, keepdim=True).values
+    return x - torch.log(torch.sum(torch.exp(x), dim=-1, keepdim=True))
+
+def dropout(x: torch.Tensor, p: float, training: bool=True) -> torch.Tensor:
+    """Randomly set a fraction p of the numbers to 0 during training, and scale the rest up
+    by 1/(1-p) so the average stays the same. Does nothing when not training.
+    """
+    if not training or p == 0.0:
+        return x
+    keep = (torch.rand_like(x) >= p).to(x.dtype)  # 1 = keep, 0 = drop
+    return x * keep / (1.0 - p)
 
 def layer_norm(
         x: torch.Tensor, 

@@ -97,5 +97,4 @@ print((approx - gelu(x)).abs().max().item() < 1e-3)   # True
 </details>
 
 ---
-[Course map](../README.md) · Prev: [05](05_linear_layer.md) · Next: [08 · Softmax](08_softmax.md)
-*(lesson 07 is coming soon)*
+[Course map](../README.md) · Prev: [05](05_linear_layer.md) · Next: [07 · Your first neural network](07_first_neural_network.md)

@@ -85,4 +85,4 @@ Repeat that ~50,000 times and you get GPT-2's vocabulary, where common words are
 </details>
 
 ---
-[Course map](../README.md) · Prev: [08](08_softmax.md) · Next: [14 · Token embeddings](14_token_embeddings.md)
+[Course map](../README.md) · Prev: [12](12_training_tricks.md) · Next: [14 · Token embeddings](14_token_embeddings.md)

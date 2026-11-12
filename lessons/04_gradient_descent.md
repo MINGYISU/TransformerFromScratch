@@ -117,7 +117,7 @@ keep bouncing between $3$ and $-3$ forever. The learning rate is too big.
   for every step is too slow. So each step uses a small random **batch**. The slope is a bit noisy,
   but it's much faster, and works.
 - Real loss surfaces aren't a perfect bowl. They have flat areas and small dips. Smarter optimizers
-  like **Adam** (lesson 11) help move through them faster.
+  like **[Adam](11_momentum_and_adam.md)** (lesson 11) help move through them faster.
 </details>
 
 ---
