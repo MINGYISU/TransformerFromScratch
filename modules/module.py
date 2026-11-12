@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import math
 import os
 import json
 import warnings
@@ -66,6 +67,12 @@ class Module(ABC):
         """Return a generator of all parameters in the module and its sub-modules."""
         for _, ref in self.named_parameters():
             yield ref
+
+    def to(self, device):
+        """Move all parameters to a device (e.g. 'cpu' or 'cuda'), in place."""
+        for p in self.parameters():
+            p.data = p.data.to(device)
+        return self
     
     def save(self, folder_path, file_name: str=None):
         """Save the module to a file using pickle.
@@ -154,7 +161,8 @@ class Linear(Module):
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
-        self.W = Parameter(torch.randn(out_features, in_features))
+        # scale by 1/sqrt(in_features) so outputs keep roughly unit variance (see lessons/03_linear_layer.md)
+        self.W = Parameter(torch.randn(out_features, in_features) / math.sqrt(in_features))
         self.b = Parameter(torch.zeros(out_features)) if bias else None
 
     def _param_keys(self):
@@ -195,26 +203,22 @@ class LayerNorm(Module):
         return layer_norm(x, gamma=self.gamma, beta=self.beta, eps=self.eps)
     
 class MultiHeadSelfAttention(Module):
-    """
-    Args:
-        ...
-        padding_mask: torch.Tensor, mask to apply on the attention scores, if provided. 
-                       This is typically used to mask out padding tokens in the input.
+    """Causal multi-head self-attention.
+    No padding mask is needed: we pad on the right, and the causal mask already stops
+    real tokens from looking at the padding after them (see lessons/17_masks.md).
     """
     embed_dim: int
     num_heads: int
     qkv_proj: Linear
     out_proj: Linear
-    padding_mask: torch.Tensor | None
 
-    def __init__(self, embed_dim, num_heads, padding_mask=None, *args, **kwargs):
+    def __init__(self, embed_dim, num_heads, *args, **kwargs):
         super().__init__()
         assert embed_dim % num_heads == 0, f'Embed Size {embed_dim} cannot be divided by # of heads {num_heads} evenly!'
         self.embed_dim = embed_dim
         self.num_heads = num_heads
         self.qkv_proj = Linear(embed_dim, embed_dim*3)
         self.out_proj = Linear(embed_dim, embed_dim)
-        self.padding_mask = padding_mask
 
     def _param_keys(self):
         return 'qkv_proj', 'out_proj'

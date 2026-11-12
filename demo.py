@@ -2,22 +2,15 @@ from models.example.model import MyGPT
 import torch
 
 def main():
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = MyGPT(max_seq_length=100, embed_dim=10, num_layers=2, num_heads=2).to(device)
-    model = model.load('models/saved_models/MyGPT.pkl')
+    torch.manual_seed(0)
+    model = MyGPT.load('models/saved_models/MyGPT.pkl').to('cpu')
+    eos = model.tokenizer.vocabulary['<EOS>']
 
-    input = ['a', 'ap', 'app', 'appl', 'apple', 'b', 'ba', 'ban', 'bana', 'banan', 'banana']
-    input_ids, mask = model.tokenizer.tokenize(input)
-    print(input_ids)
-
-    output_id = model.generate(input_ids=input_ids.to(device), max_new_tokens=20, eos_token_id=model.tokenizer.vocabulary['<EOS>'])
-    decoded = model.tokenizer.decode(output_id.tolist())
-    for inp, out in zip(input, decoded):
-        print(f"Input: {inp}")
-        print(f"Output: {out} ✅ {len(out)} characters generated")
-        print('-'*50)
+    for prompt in ['a', 'b', 'c', 'gr', 'me', 'pa']:
+        # prompts must NOT end with <EOS>, otherwise the model thinks the word is already finished
+        input_ids, _ = model.tokenizer.tokenize([prompt], add_eos=False)
+        output_ids = model.generate(input_ids, max_new_tokens=20, eos_token_id=eos)
+        print(f"{prompt!r:6} -> {model.tokenizer.decode(output_ids.tolist())[0]}")
 
 if __name__ == '__main__':
-    import sys
-    sys.path.insert(0, '.')
     main()

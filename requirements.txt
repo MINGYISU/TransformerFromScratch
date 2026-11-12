@@ -1,5 +1,2 @@
-numpy
-pandas
 torch
-transformer
-pickle
+pytest

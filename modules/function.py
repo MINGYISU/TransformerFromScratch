@@ -89,10 +89,8 @@ def mha(
         W_qkv: torch.Tensor, b_qkv: torch.Tensor, 
         W_out: torch.Tensor, b_out: torch.Tensor,
         num_heads: int, 
-        padding_mask: torch.Tensor=None,
 ) -> torch.Tensor:
-    """Multi-Head Self-Attention
-    Padding mask is not implemented yet in the function body. 
+    """Causal Multi-Head Self-Attention
     Terminologies:
         B: batch size
         T: sequence length
@@ -114,7 +112,8 @@ def mha(
     Q, K, V = (a.view(B, T, num_heads, head_dim) for a in (Q, K, V))
 
     # prevent preceding tokens attending to tokens afterwards 
-    causal_mask = (torch.tril(torch.ones(T, T)) == 0).to(x.device)  # [T, T]
+    # True = "not allowed to look" (the upper triangle, i.e. the future)
+    causal_mask = torch.triu(torch.ones(T, T, dtype=torch.bool, device=x.device), diagonal=1)  # [T, T]
 
     # Purpose: compute attn scores for all heads at once (vectorized) and concat embeddings back to original [T, E] size
         # view(B, T, H, Dh): reshape QKV of shape [B, T, E (== H*Dh)] -> [B, T, H, Dh]

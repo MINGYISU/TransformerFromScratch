@@ -22,17 +22,19 @@ class MyGptTokenizer:
         with open(vocab_path, 'w') as f:
             json.dump(self.vocabulary, f)
     
-    def tokenize(self, texts):
+    def tokenize(self, texts, add_eos: bool=True):
         """Args:
             texts: List of strings, shape [batch size]
+            add_eos: append <EOS> to every text (True for training data, False for prompts)
         
         Returns:
-            List of List of token indices, shape [batch size, sequence length]
+            token ids [batch size, sequence length] (right-padded with 0) and a mask (1 = real token, 0 = padding)
         """
         tokenized = []
         for text in texts:
             tokens = [self.vocabulary.get(char, 0) for char in text]
-            tokens.append(self.vocabulary['<EOS>'])
+            if add_eos:
+                tokens.append(self.vocabulary['<EOS>'])
             tokenized.append(tokens)
         max_len = max(len(t) for t in tokenized)
         padded = [t + [0]*(max_len - len(t)) for t in tokenized]
