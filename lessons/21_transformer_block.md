@@ -3,13 +3,15 @@
 > In one sentence: a transformer block is "talk to other tokens" (attention) followed by
 > "think alone" (feed-forward), each wrapped in LayerNorm + residual.
 
-## Intuition
+## The idea
 
-We now have every part. One block is just these four lines:
+We now have every part. One block is just these two lines:
 
-```
-x = x + attention(layer_norm(x))      # tokens exchange information
-x = x + feed_forward(layer_norm(x))   # each token processes what it gathered
+```math
+\begin{aligned}
+x &\leftarrow x + \text{Attention}(\text{LayerNorm}(x)) && \text{tokens exchange information} \cr
+x &\leftarrow x + \text{FFN}(\text{LayerNorm}(x)) && \text{each token processes what it gathered}
+\end{aligned}
 ```
 
 GPT stacks the same block `N` times (GPT-2 small: 12, our toy model: 2). Every block has its
@@ -62,8 +64,9 @@ Each block takes `[B, T, E]` and returns `[B, T, E]`, so the output of one fits 
 
 <details><summary>Going deeper: pre-norm vs post-norm</summary>
 
-The original 2017 Transformer normalised **after** the residual: `x = norm(x + f(x))` ("post-norm").
-GPT-2 moved it **before**: `x = x + f(norm(x))` ("pre-norm"). Pre-norm leaves the residual
+The original 2017 Transformer normalised **after** the residual ("post-norm"):
+$x \leftarrow \text{LayerNorm}(x + f(x))$.
+GPT-2 moved it **before** ("pre-norm"): $x \leftarrow x + f(\text{LayerNorm}(x))$. Pre-norm leaves the residual
 path completely untouched, which makes deep models much easier to train. Almost all modern LLMs use pre-norm.
 </details>
 

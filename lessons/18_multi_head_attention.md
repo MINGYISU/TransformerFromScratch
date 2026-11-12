@@ -3,12 +3,18 @@
 > In one sentence: run several small attentions side by side, each free to look for something
 > different, then glue their results back together.
 
-## Intuition
+## The idea
 
 One attention gives each token **one** weighted average. But a token may want several things at
 once — e.g. "the previous letter" *and* "the first letter of the word". So we cut each
-`E`-dim Q, K, V into `H` pieces ("heads") of size `Dh = E / H`, run attention on each piece
-separately, and concatenate the results.
+$E$-dim Q, K, V into $H$ pieces ("heads") of size $D_h = E / H$, run attention on each piece
+separately, and concatenate the results:
+
+```math
+\text{MultiHead}(x) = \text{Concat}(\text{head}_1, \dots, \text{head}_H) W_{\text{out}},
+\qquad
+\text{head}_h = \text{Attention}(Q_h, K_h, V_h)
+```
 
 It costs the same as one big attention — it's just the same numbers split differently.
 
@@ -57,11 +63,11 @@ The class [`MultiHeadSelfAttention`](../modules/module.py) just owns `W_qkv`/`W_
 
 ## Check yourself
 
-1. `E = 32, H = 2`. What is `Dh`? What happens with `H = 3`?
+1. $E = 32$, $H = 2$. What is $D_h$? What happens with $H = 3$?
 
 <details><summary>Answer</summary>
 
-`Dh = 16`. With `H = 3`, 32 can't be split evenly — the class raises an error (`embed_dim % num_heads == 0` is required).
+$D_h = 32 / 2 = 16$. With $H = 3$, 32 can't be split evenly — the class raises an error (`embed_dim % num_heads == 0` is required).
 </details>
 
 <details><summary>Going deeper: why the output projection <code>W_out</code>?</summary>

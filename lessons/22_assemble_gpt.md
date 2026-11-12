@@ -3,7 +3,7 @@
 > In one sentence: GPT = embeddings → a stack of transformer blocks → final LayerNorm →
 > a score for every word in the vocabulary.
 
-## Intuition
+## The idea
 
 ```
 ids            [B, T]
@@ -17,7 +17,11 @@ logits         [B, T, V]
 ```
 
 `logits[b, t]` is a list of `V` scores: "how likely is each token to come **after** position `t`".
-[Softmax](08_softmax.md) turns them into probabilities.
+[Softmax](08_softmax.md) turns them into probabilities:
+
+```math
+P(\text{next token} = i) = \text{softmax}(\text{logits})_i
+```
 
 ## Code
 
@@ -54,7 +58,7 @@ print(ids.shape, '->', logits.shape)                          # [2, 6] -> [2, 6,
 print(sum(p.numel() for p in model.parameters()), 'parameters')
 ```
 
-An untrained model is guessing: every token gets roughly the same probability, about `1/87 ≈ 0.011`.
+An untrained model is guessing: every token gets roughly the same probability, about $1/87 \approx 0.011$.
 
 ```python
 from modules.function import softmax
@@ -74,7 +78,7 @@ prediction to token `i`?". The most similar token gets the highest score.
 <details><summary>Going deeper: weight tying</summary>
 
 Using the input embedding table again as the output layer is called **weight tying**
-(GPT-2 does it too). It saves `V × E` parameters and makes sense: a token should be predicted when
+(GPT-2 does it too). It saves $V \times E$ parameters and makes sense: a token should be predicted when
 the output looks like that token's own embedding. Many larger models use a separate output matrix instead.
 </details>
 

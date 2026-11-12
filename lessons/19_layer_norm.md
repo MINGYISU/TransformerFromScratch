@@ -3,14 +3,21 @@
 > In one sentence: LayerNorm rescales each token's vector to mean 0 and spread 1, then lets the
 > model learn its own preferred scale and shift.
 
-## Intuition
+## The idea
 
 As vectors pass through many layers, their numbers can drift very large or very small, which
 makes training unstable. LayerNorm resets them, **for every token separately**:
 
 1. subtract the mean of the vector → centred at 0
 2. divide by its standard deviation → spread of 1
-3. multiply by `gamma` and add `beta` (both learned, start at 1 and 0)
+3. multiply by $\gamma$ (`gamma`) and add $\beta$ (`beta`) — both learned, starting at 1 and 0
+
+```math
+\text{LayerNorm}(x) = \gamma \cdot \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} + \beta
+```
+
+where $\mu$ is the mean of the $E$ numbers in $x$, $\sigma^2$ their variance, and $\epsilon$ a tiny number
+(like $10^{-5}$) that avoids dividing by 0.
 
 ## Code
 
@@ -47,7 +54,11 @@ are in the batch — and it works the same for a batch of 1 during generation.
 <details><summary>Going deeper: RMSNorm</summary>
 
 LLaMA and most newer models use **RMSNorm**: skip the mean, just divide by the root-mean-square.
-One less step, works just as well.
+One less step, works just as well:
+
+```math
+\text{RMSNorm}(x) = \gamma \cdot \frac{x}{\sqrt{\frac{1}{E} \sum_{i=1}^{E} x_i^2 + \epsilon}}
+```
 
 ```python
 def rms_norm(x, gamma, eps=1e-5):

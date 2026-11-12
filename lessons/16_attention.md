@@ -3,7 +3,7 @@
 > In one sentence: every token looks at the other tokens, decides how relevant each one is,
 > and takes a weighted average of their information.
 
-## Intuition
+## The idea
 
 Each token makes three vectors (each is a [linear layer](05_linear_layer.md) of the token):
 
@@ -14,13 +14,15 @@ Each token makes three vectors (each is a [linear layer](05_linear_layer.md) of 
 | **V**alue | "What will I give you if you pick me?" |
 
 Then, for every token:
-1. **score** every other token: dot product `Q · K` (big = good match)
+1. **score** every other token: the dot product $q_i \cdot k_j$ (big = good match)
 2. turn scores into weights with [softmax](08_softmax.md) (they sum to 1)
 3. output = weighted average of the `V`s
 
+```math
+\text{Attention}(Q, K, V) = \text{softmax}\left( \frac{Q K^\top}{\sqrt{d}} \right) V
 ```
-Attention(Q, K, V) = softmax(Q Kᵀ / √d) V
-```
+
+where $d$ is the length of each query/key vector.
 
 ## Code
 
@@ -60,14 +62,14 @@ print(attention(Q, K, V)[0])        # ≈ [0, 9] — so it receives token 2's va
 
 <details><summary>Answer</summary>
 
-`[6, 6]` — one score per pair. It grows with T², so doubling the text length makes attention 4× more expensive.
+`[6, 6]` — one score per pair. It grows with $T^2$, so doubling the text length makes attention 4× more expensive.
 </details>
 
 <details><summary>Going deeper: why divide by <code>√d</code>?</summary>
 
-A dot product of two random `d`-dim vectors has a size of about `√d`. With large `d` the scores get
+A dot product of two random $d$-dim vectors has a size of about $\sqrt{d}$. With large $d$ the scores get
 big, softmax becomes almost one-hot, and its gradients become almost 0 — learning stalls.
-Dividing by `√d` keeps the scores around size 1:
+Dividing by $\sqrt{d}$ keeps the scores around size 1:
 
 ```python
 d = 512

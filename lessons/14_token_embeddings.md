@@ -2,7 +2,7 @@
 
 > In one sentence: an embedding table gives every token id its own learnable vector.
 
-## Intuition
+## The idea
 
 A token id like `16` is just a name — "16" is not "bigger" than "5" in any useful way.
 So we keep a table with one row per token: row `i` is the vector for token `i`.
@@ -47,11 +47,11 @@ print(torch.equal(x[0, 1], x[0, 2]))   # True  -> we fix this in lesson 15
 
 ## Check yourself
 
-1. GPT-2 small has `V = 50257` and `E = 768`. How many numbers are in its embedding table?
+1. GPT-2 small has $V = 50257$ and $E = 768$. How many numbers are in its embedding table?
 
 <details><summary>Answer</summary>
 
-`50257 * 768 ≈ 38.6 million` — about a third of GPT-2 small's 124M parameters.
+$50257 \times 768 \approx 38.6$ million — about a third of GPT-2 small's 124M parameters.
 </details>
 
 <details><summary>Going deeper: why <code>* 0.02</code>?</summary>

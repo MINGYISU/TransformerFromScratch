@@ -9,18 +9,19 @@ You're on a hill in thick fog and want to reach the bottom. You can't see the va
 but you can feel which way the ground slopes under your feet. So: take a small step downhill,
 feel again, step again. That's **gradient descent**.
 
-```
-new x = x − learning_rate × slope
+```math
+x_{\text{new}} = x - \eta \cdot f'(x)
 ```
 
+- $f'(x)$ is the slope ([lesson 02](02_gradients.md))
 - the **minus** sign: the slope points uphill, we go the other way
-- the **learning rate** (`lr`): how big a step to take
+- $\eta$ (the Greek letter "eta") is the **learning rate** — how big a step to take. In code it's called `lr`.
 
 ## By hand
 
-Minimise `f(x) = x²` (slope `2x`), starting at `x = 3` with `lr = 0.3`:
+Minimise $f(x) = x^2$ (slope $f'(x) = 2x$), starting at $x = 3$ with $\eta = 0.3$:
 
-| step | x | slope `2x` | new x = x − 0.3 × slope |
+| step | $x$ | slope $2x$ | $x - 0.3 \cdot 2x$ |
 |---|---|---|---|
 | 1 | 3.0 | 6.0 | 1.2 |
 | 2 | 1.2 | 2.4 | 0.48 |
@@ -73,8 +74,13 @@ for step in range(3):
     print(step + 1, round(x.item(), 2))    # 1.2, 0.48, 0.19
 ```
 
-Now the real thing — **learning from data**. We have points that follow `y = 2x`, but the model
-doesn't know the `2`. It starts with a guess `w = 0` and learns it by minimising the [loss](03_loss.md):
+Now the real thing — **learning from data**. We have points that follow $y = 2x$, but the model
+doesn't know the $2$. Its prediction is $\hat{y} = w x$; it starts with a guess $w = 0$ and learns $w$ by
+minimising the [MSE loss](03_loss.md):
+
+```math
+L(w) = \frac{1}{n} \sum_{i=1}^{n} (w x_i - y_i)^2
+```
 
 ```python
 from modules.loss import mse
@@ -97,12 +103,12 @@ bigger model (millions of `w`s instead of one) and a different loss.
 
 ## Check yourself
 
-1. At `x = 3` the slope of `x²` is `6`. With `lr = 1.0`, where do you land? Is that good?
+1. At $x = 3$ the slope of $x^2$ is $6$. With $\eta = 1.0$, where do you land? Is that good?
 
 <details><summary>Answer</summary>
 
-`3 − 1.0 × 6 = −3`. You jumped right over the bottom to the same height on the other side — and you'll
-keep bouncing between 3 and −3 forever. The learning rate is too big.
+$3 - 1.0 \cdot 6 = -3$. You jumped right over the bottom to the same height on the other side — and you'll
+keep bouncing between $3$ and $-3$ forever. The learning rate is too big.
 </details>
 
 <details><summary>Going deeper: "stochastic", and getting stuck</summary>

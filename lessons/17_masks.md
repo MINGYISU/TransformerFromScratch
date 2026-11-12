@@ -3,7 +3,7 @@
 > In one sentence: a mask hides some tokens from attention by setting their score to `-inf`,
 > so softmax gives them weight 0.
 
-## Intuition
+## The idea
 
 **Causal mask.** GPT learns by predicting the next token. If token 2 could look at token 3
 while predicting token 3, that would be cheating. So each token may only look at itself
@@ -17,8 +17,16 @@ token 2              ✓   ✓   ✓   ✗
 token 3              ✓   ✓   ✓   ✓
 ```
 
-The ✗ cells are the upper triangle. We set those scores to `-inf`; `exp(-inf) = 0`, so after
-softmax they get exactly 0 weight.
+The ✗ cells are the upper triangle. We set those scores to $-\infty$; since $e^{-\infty} = 0$, after
+softmax they get exactly 0 weight:
+
+```math
+\text{score}_{ij} =
+\begin{cases}
+\dfrac{q_i \cdot k_j}{\sqrt{d}} & \text{if } j \le i \quad \text{(past or itself)} \cr
+-\infty & \text{if } j > i \quad \text{(future)}
+\end{cases}
+```
 
 ## Code
 
@@ -73,8 +81,8 @@ Yes. Then padding comes *before* the real tokens, and the causal mask would let 
 
 <details><summary>Going deeper: why <code>-inf</code> and not just 0?</summary>
 
-Setting a *score* to 0 doesn't hide it — `exp(0) = 1` still gets weight. We must make the
-*weight* 0, and the only score that does that is `-inf`. (Careful: if a whole row is `-inf`,
+Setting a *score* to 0 doesn't hide it — $e^0 = 1$ still gets weight. We must make the
+*weight* 0, and the only score that does that is $-\infty$. (Careful: if a whole row is `-inf`,
 softmax returns `nan`. The causal mask never does that, since every token can see itself.)
 </details>
 

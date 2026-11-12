@@ -3,7 +3,7 @@
 > In one sentence: we train GPT by showing it text and asking, at **every** position,
 > "what comes next?" — the target is just the input shifted by one.
 
-## Intuition
+## The idea
 
 One word gives us many training examples at once:
 
@@ -66,7 +66,7 @@ for step in range(301):
         print(step, round(loss.item(), 3))
 ```
 
-The loss starts around `ln(87) ≈ 4.47` (pure guessing among 87 tokens) and drops fast.
+The loss starts around $\ln(87) \approx 4.47$ (pure guessing among 87 tokens) and drops fast.
 
 ## Check yourself
 

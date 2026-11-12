@@ -2,7 +2,7 @@
 
 > In one sentence: to write text, ask the model for the next token, add it to the input, and repeat.
 
-## Intuition
+## The idea
 
 The model gives a prediction at every position, but for writing we only need the **last** one
 (it has seen the whole text so far):
@@ -65,7 +65,12 @@ yet we recompute them each step. Real systems cache them — the "KV cache".
 
 <details><summary>Going deeper: temperature, greedy, top-k, top-p</summary>
 
-All four just reshape the probabilities before sampling:
+All four just reshape the probabilities before sampling. **Temperature** $t$ divides the logits $z$
+before softmax:
+
+```math
+p_i = \frac{e^{z_i / t}}{\sum_j e^{z_j / t}}
+```
 
 ```python
 logits = torch.tensor([[2.0, 1.0, 0.5, -1.0]])

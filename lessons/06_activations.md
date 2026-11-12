@@ -7,14 +7,28 @@
 
 A [linear layer](05_linear_layer.md) can only draw straight lines. Worse: two linear layers in a
 row are *still* just one straight line — multiplying by 2 and then by 3 is the same as multiplying by 6.
-Stacking them gains nothing.
+Stacking them gains nothing:
+
+```math
+(x W_1) W_2 = x (W_1 W_2) = x W
+```
 
 The fix is to **bend** the numbers between layers with a simple function:
 
 ![ReLU and GELU](figures/06_activations.png)
 
-- **ReLU**: `max(0, x)` — keep positive numbers, turn negative ones into 0. The simplest bend.
-- **GELU**: a smooth version of ReLU. GPT uses this one.
+- **ReLU** — keep positive numbers, turn negative ones into 0. The simplest bend:
+
+```math
+\text{ReLU}(x) = \max(0, x)
+```
+
+- **GELU** — a smooth version of ReLU. GPT uses this one. It multiplies $x$ by $\Phi(x)$,
+  the chance that a random normal number is below $x$ (close to 0 for very negative $x$, close to 1 for very positive $x$):
+
+```math
+\text{GELU}(x) = x \cdot \Phi(x)
+```
 
 With a bend between them, stacked layers can combine many small bends into any curved shape they need.
 
@@ -60,7 +74,7 @@ print(torch.allclose(gelu(v @ W1) @ W2, v @ (W1 @ W2), atol=1e-5))  # False: GEL
 
 ## Check yourself
 
-1. What is the slope of ReLU at `x = -2`? Why might that be a problem for [gradient descent](04_gradient_descent.md)?
+1. What is the slope of ReLU at $x = -2$? Why might that be a problem for [gradient descent](04_gradient_descent.md)?
 
 <details><summary>Answer</summary>
 
@@ -70,8 +84,11 @@ ever sees negative inputs stops learning ("dead ReLU"). GELU's slope there is sm
 
 <details><summary>Going deeper: the tanh approximation</summary>
 
-The original GPT-2 code used a faster formula:
-`0.5 · x · (1 + tanh(√(2/π) · (x + 0.044715 x³)))`. It differs from exact GELU by less than 0.001.
+The original GPT-2 code used a faster formula, which differs from exact GELU by less than 0.001:
+
+```math
+\text{GELU}(x) \approx 0.5 x \left( 1 + \tanh\left( \sqrt{2/\pi} \left( x + 0.044715 x^3 \right) \right) \right)
+```
 
 ```python
 approx = 0.5 * x * (1 + torch.tanh(math.sqrt(2 / math.pi) * (x + 0.044715 * x ** 3)))

@@ -13,9 +13,14 @@ flowchart LR
     N --> y["y = 5.5"]
 ```
 
+```math
+y = \underbrace{0.5 \cdot 1 + (-1) \cdot 2 + 2 \cdot 3}_{\text{weights} \times \text{inputs}} + \underbrace{1}_{\text{bias}} = 5.5
 ```
-y = 0.5·1 + (−1)·2 + 2·3 + 1  =  5.5
-     weights × inputs        bias
+
+In general, for inputs $x_i$, weights $w_i$ and bias $b$:
+
+```math
+y = \sum_i w_i x_i + b
 ```
 
 Each **weight** says how much the neuron cares about each input (negative = "this input pushes me down").
@@ -31,7 +36,13 @@ A layer with 2 neurons has 2 rows of weights. Computing all neurons at once is e
 inputs [3]  ×  weights [3 → 2]  +  bias [2]  =  outputs [2]
 ```
 
-Written as a formula: `y = x Wᵀ + b`. The weights `W` and the bias `b` are the knobs that
+Written as a formula:
+
+```math
+\mathbf{y} = \mathbf{x} W^\top + \mathbf{b}
+```
+
+The weights $W$ and the bias $\mathbf{b}$ are the knobs that
 [gradient descent](04_gradient_descent.md) turns. Almost every learnable part of a transformer is a layer like this.
 
 ## Code
@@ -90,14 +101,14 @@ print([name for name, _ in layer.named_parameters()])   # ['W', 'b']
 
 <details><summary>Answer</summary>
 
-`512 × 2048` weights `+ 2048` biases `= 1,050,624`.
+$512 \times 2048$ weights $+ 2048$ biases $= 1{,}050{,}624$.
 </details>
 
 <details><summary>Going deeper: why divide the starting weights by <code>√in_features</code>?</summary>
 
-Each output adds up `in_features` random products. Adding up `n` random numbers gives a result about
-`√n` times bigger. Stack a few layers and the numbers explode, and training goes badly.
-Dividing the weights by `√n` keeps outputs at about the same size as the inputs:
+Each output adds up $n$ = `in_features` random products. Adding up $n$ random numbers gives a result about
+$\sqrt{n}$ times bigger. Stack a few layers and the numbers explode, and training goes badly.
+Dividing the weights by $\sqrt{n}$ keeps outputs at about the same size as the inputs:
 
 ```python
 x = torch.randn(1000, 512)

@@ -1,9 +1,9 @@
 # 20 · Residual connections and the feed-forward network
 
 > In one sentence: the feed-forward network lets each token "think" on its own, and the
-> residual connection `x = x + f(x)` makes sure no layer can destroy what came before.
+> residual connection $x + f(x)$ makes sure no layer can destroy what came before.
 
-## Intuition
+## The idea
 
 **Feed-forward (FFN / MLP).** Attention moves information *between* tokens. The FFN then processes
 each token *alone*: grow the vector 4× wider, apply [GELU](06_activations.md), shrink it back.
@@ -12,8 +12,18 @@ each token *alone*: grow the vector 4× wider, apply [GELU](06_activations.md), 
 [E] --Linear--> [4E] --GELU--> [4E] --Linear--> [E]
 ```
 
-**Residual connection.** Instead of `x = f(x)` we write `x = x + f(x)`. Each layer only adds a
-small *correction* to the vector. If a layer is useless it can learn `f(x) ≈ 0` and do no harm.
+```math
+\text{FFN}(x) = \text{GELU}(x W_1^\top + b_1) W_2^\top + b_2
+```
+
+**Residual connection.** Instead of replacing $x$ with $f(x)$, we add:
+
+```math
+x \leftarrow x + f(x)
+```
+
+ Each layer only adds a
+small *correction* to the vector. If a layer is useless it can learn $f(x) \approx 0$ and do no harm.
 It also gives gradients a direct path back to early layers, which is why deep models can train at all.
 
 ## Code
@@ -50,16 +60,22 @@ print(torch.allclose(ffn(a)[0, 1], ffn(b)[0, 1]))   # True
 
 ## Check yourself
 
-1. Why must `f(x)` have exactly the same shape as `x`?
+1. Why must $f(x)$ have exactly the same shape as $x$?
 
 <details><summary>Answer</summary>
 
-Because we add them: `x + f(x)`. That's why the FFN shrinks back to `E`, and attention ends with an `E → E` projection.
+Because we add them: $x + f(x)$. That's why the FFN shrinks back to `E`, and attention ends with an `E → E` projection.
 </details>
 
 <details><summary>Going deeper: how residuals help gradients</summary>
 
-The gradient of `x + f(x)` with respect to `x` is `1 + f'(x)`. Even if `f'(x)` is tiny, the `1`
+The gradient of $x + f(x)$ with respect to $x$ is
+
+```math
+\frac{d}{dx} \big( x + f(x) \big) = 1 + f'(x)
+```
+
+Even if $f'(x)$ is tiny, the $1$
 passes the gradient straight through. Without it, gradients get multiplied by many small numbers
 on the way back and vanish.
 

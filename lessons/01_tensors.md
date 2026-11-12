@@ -28,8 +28,12 @@ In this course the shape of the data flowing through GPT is almost always `[B, T
 
 Multiply two vectors number by number, then add everything up:
 
+```math
+a \cdot b = \sum_i a_i b_i
 ```
-[1, 2, 3] · [4, 0, -1]  =  1·4 + 2·0 + 3·(-1)  =  1
+
+```math
+[1, 2, 3] \cdot [4, 0, -1] = 1 \cdot 4 + 2 \cdot 0 + 3 \cdot (-1) = 1
 ```
 
 A big dot product means the two vectors "point the same way" — they are **similar**.
@@ -38,9 +42,13 @@ Attention (lesson 16) is built on exactly this.
 **Matrix multiplication** is just many dot products at once: every row of the first
 matrix with every column of the second.
 
-```
-[[1, 2],     [[5],        [[1·5 + 2·6],      [[17],
- [3, 4]]  ×   [6]]   =     [3·5 + 4·6]]   =   [39]]
+```math
+\begin{bmatrix} 1 & 2 \cr 3 & 4 \end{bmatrix}
+\begin{bmatrix} 5 \cr 6 \end{bmatrix}
+=
+\begin{bmatrix} 1 \cdot 5 + 2 \cdot 6 \cr 3 \cdot 5 + 4 \cdot 6 \end{bmatrix}
+=
+\begin{bmatrix} 17 \cr 39 \end{bmatrix}
 ```
 
 ## Using PyTorch to hold tensors
@@ -75,11 +83,11 @@ print(M @ v)                 # [[17], [39]]
 ## Check yourself
 
 1. A batch of 8 texts, 10 tokens each, each token described by 32 numbers. What's the shape? How many numbers in total?
-2. What is `[1, 0] · [0, 1]`? What does that say about the two vectors?
+2. What is $[1, 0] \cdot [0, 1]$? What does that say about the two vectors?
 
 <details><summary>Answers</summary>
 
-1. `[8, 10, 32]` — `8 × 10 × 32 = 2560` numbers.
+1. `[8, 10, 32]` — $8 \times 10 \times 32 = 2560$ numbers.
 2. `0` — they have nothing in common (they point in completely different directions).
 </details>
 

@@ -56,7 +56,7 @@ To run a lesson's code yourself, paste its `python` blocks in order into `python
 | # | Lesson | Idea |
 |---|---|---|
 | 01 | ✅ [Tensors](lessons/01_tensors.md) | scalars, vectors, matrices; the dot product |
-| 02 | ✅ [Gradients](lessons/02_gradients.md) | the slope of `x²`, and which way is downhill |
+| 02 | ✅ [Gradients](lessons/02_gradients.md) | the slope of $x^2$, and which way is downhill |
 | 03 | ✅ [Loss](lessons/03_loss.md) | one number for "how wrong", and why we want its minimum |
 | 04 | ✅ [Gradient descent](lessons/04_gradient_descent.md) | walk downhill to the minimum, step by step |
 
@@ -71,7 +71,7 @@ To run a lesson's code yourself, paste its `python` blocks in order into `python
 | # | Lesson | Idea |
 |---|---|---|
 | 08 | ✅ [Softmax](lessons/08_softmax.md) | scores → probabilities |
-| 09 | 🚧 Cross-entropy loss | `-log p(correct answer)` |
+| 09 | 🚧 Cross-entropy loss | $-\log p(\text{correct answer})$ |
 | 10 | 🚧 Metrics | accuracy, perplexity |
 | 11 | 🚧 Momentum and Adam | smarter steps than plain SGD |
 | 12 | 🚧 Training tricks | lr warmup/decay, gradient clipping, dropout |
@@ -86,11 +86,11 @@ To run a lesson's code yourself, paste its `python` blocks in order into `python
 ### Part 5 · The transformer
 | # | Lesson | Idea |
 |---|---|---|
-| 16 | ✅ [Attention](lessons/16_attention.md) | `softmax(QKᵀ/√d) V` |
+| 16 | ✅ [Attention](lessons/16_attention.md) | $\text{softmax}(QK^\top / \sqrt{d}) V$ |
 | 17 | ✅ [Masks](lessons/17_masks.md) | no peeking at the future |
 | 18 | ✅ [Multi-head attention](lessons/18_multi_head_attention.md) | several attentions side by side |
 | 19 | ✅ [LayerNorm](lessons/19_layer_norm.md) | keeping numbers in a healthy range |
-| 20 | ✅ [Residuals and feed-forward](lessons/20_residual_and_feed_forward.md) | `x = x + f(x)` |
+| 20 | ✅ [Residuals and feed-forward](lessons/20_residual_and_feed_forward.md) | $x + f(x)$ |
 | 21 | ✅ [The transformer block](lessons/21_transformer_block.md) | putting 16–20 together |
 
 ### Part 6 · The language model

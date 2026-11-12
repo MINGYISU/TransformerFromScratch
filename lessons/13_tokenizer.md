@@ -2,7 +2,7 @@
 
 > In one sentence: a tokenizer turns text into a list of integer ids (and back), because models only understand numbers.
 
-## Intuition
+## The idea
 
 The simplest tokenizer: **one character = one token**. We give every character a number:
 
