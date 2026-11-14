@@ -1,5 +1,7 @@
 # 20 · Residual connections and the feed-forward network
 
+**Level: 🟡 Intermediate**
+
 > In one sentence: the feed-forward network lets each token "think" on its own, and the
 > residual connection $x + f(x)$ makes sure no layer can destroy what came before.
 

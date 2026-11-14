@@ -1,5 +1,7 @@
 # 14 · Token embeddings
 
+**Level: 🟢 Basic**
+
 > In one sentence: an embedding table gives every token id its own learnable vector.
 
 ## The idea

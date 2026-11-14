@@ -1,5 +1,7 @@
 # 10 · Metrics
 
+**Level: 🟡 Intermediate**
+
 > In one sentence: the loss is what the *model* learns from; metrics are what *we* read to
 > decide whether the model is any good.
 

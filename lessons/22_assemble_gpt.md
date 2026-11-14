@@ -1,5 +1,7 @@
 # 22 · Assembling GPT
 
+**Level: 🟢 Basic**
+
 > In one sentence: GPT = embeddings → a stack of transformer blocks → final LayerNorm →
 > a score for every word in the vocabulary.
 
@@ -15,6 +17,10 @@ x              [B, T, E]
  │ x @ token_embedᵀ                 (score each vocabulary token)
 logits         [B, T, V]
 ```
+
+> **Coming from lesson 17 on the 🟢 path?** You skipped the details of the block, which is fine. A transformer block is
+> *attention* (tokens look at earlier tokens, [lesson 16](16_attention.md)) followed by a *feed-forward* network (each token
+> thinks on its own), and LayerNorm just keeps the numbers in a healthy range. Stacking blocks never changes the shape `[B, T, E]`.
 
 `logits[b, t]` is a list of `V` scores: "how likely is each token to come **after** position `t`".
 [Softmax](08_softmax.md) turns them into probabilities:

@@ -1,5 +1,7 @@
 # 25 · Training it end to end
 
+**Level: 🟡 Intermediate**
+
 > In one sentence: every piece from this course in one loop — and how to read the numbers it prints.
 
 ## The idea

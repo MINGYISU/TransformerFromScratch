@@ -1,5 +1,7 @@
 # 27 · MyGPT, the complete picture
 
+**Level: 🟡 Intermediate**
+
 > In one sentence: our `MyGPT` is the right-hand half of the famous transformer diagram — every box
 > in that picture is a few lines of code you've already written.
 

@@ -1,5 +1,7 @@
 # 23 · Next-token training
 
+**Level: 🟢 Basic**
+
 > In one sentence: we train GPT by showing it text and asking, at **every** position,
 > "what comes next?" — the target is just the input shifted by one.
 

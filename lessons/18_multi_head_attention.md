@@ -1,5 +1,7 @@
 # 18 · Multi-head attention
 
+**Level: 🟡 Intermediate**
+
 > In one sentence: run several small attentions side by side, each free to look for something
 > different, then glue their results back together.
 

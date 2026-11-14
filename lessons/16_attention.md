@@ -1,5 +1,7 @@
 # 16 · Attention
 
+**Level: 🟢 Basic**
+
 > In one sentence: every token looks at the other tokens, decides how relevant each one is,
 > and takes a weighted average of their information.
 

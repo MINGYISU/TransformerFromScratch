@@ -1,5 +1,7 @@
 # 08 · Softmax
 
+**Level: 🟢 Basic**
+
 > In one sentence: softmax turns any list of scores into probabilities — all positive, summing to 1,
 > and bigger scores get bigger probabilities.
 

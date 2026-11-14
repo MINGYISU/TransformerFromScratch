@@ -1,5 +1,7 @@
 # 07 · Your first neural network
 
+**Level: 🟢 Basic**
+
 > In one sentence: stack two linear layers with a bend (activation) between them, train them
 > with gradient descent, and they can learn a pattern no single straight line can.
 

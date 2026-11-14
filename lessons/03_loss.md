@@ -1,5 +1,7 @@
 # 03 · Loss
 
+**Level: 🟢 Basic**
+
 > In one sentence: the loss is a single number that says **how wrong** the model is —
 > so learning means finding the settings that make the loss as small as possible.
 

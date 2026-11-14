@@ -1,5 +1,7 @@
 # 15 · Positional embeddings
 
+**Level: 🟢 Basic**
+
 > In one sentence: we add a "where am I" vector to each token vector, so the model can tell
 > `dog bites man` from `man bites dog`.
 

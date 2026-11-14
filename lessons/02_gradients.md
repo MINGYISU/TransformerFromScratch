@@ -1,5 +1,7 @@
 # 02 · Gradients
 
+**Level: 🟢 Basic**
+
 > In one sentence: the gradient tells you how much the output changes when you nudge an input
 > a tiny bit — and so, which direction is "downhill".
 

@@ -1,5 +1,7 @@
 # 17 · Masks
 
+**Level: 🟢 Basic**
+
 > In one sentence: a mask hides some tokens from attention by setting their score to `-inf`,
 > so softmax gives them weight 0.
 
@@ -88,3 +90,5 @@ softmax returns `nan`. The causal mask never does that, since every token can se
 
 ---
 [Course map](../README.md) · Prev: [16](16_attention.md) · Next: [18 · Multi-head attention](18_multi_head_attention.md)
+
+🟢 First read? Skip ahead to [22 · Assembling GPT](22_assemble_gpt.md).

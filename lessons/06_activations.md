@@ -1,5 +1,7 @@
 # 06 · Activation functions
 
+**Level: 🟢 Basic**
+
 > In one sentence: an activation is a simple bend applied to every number, so that stacked
 > layers can learn curved patterns instead of only straight lines.
 

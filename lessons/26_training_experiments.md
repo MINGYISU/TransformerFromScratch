@@ -1,5 +1,7 @@
 # 26 · Training experiments
 
+**Level: 🔴 Advanced**
+
 > In one sentence: to find out what works, change **one** setting at a time, train a few times with
 > different random seeds, and compare the results with metrics — against a baseline and against the best possible score.
 

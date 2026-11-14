@@ -1,5 +1,7 @@
 # 21 · The transformer block
 
+**Level: 🟡 Intermediate**
+
 > In one sentence: a transformer block is "talk to other tokens" (attention) followed by
 > "think alone" (feed-forward), each wrapped in LayerNorm + residual.
 

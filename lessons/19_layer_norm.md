@@ -1,5 +1,7 @@
 # 19 · Layer normalization
 
+**Level: 🟡 Intermediate**
+
 > In one sentence: LayerNorm rescales each token's vector to mean 0 and spread 1, then lets the
 > model learn its own preferred scale and shift.
 

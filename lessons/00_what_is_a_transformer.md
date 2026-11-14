@@ -1,5 +1,7 @@
 # 00 · What is a transformer?
 
+**Level: 🟢 Basic**
+
 > In one sentence: a large language model (LLM) is a machine that reads some text and
 > **guesses the next piece of text** — and a *transformer* is the design of that machine.
 

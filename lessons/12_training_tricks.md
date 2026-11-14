@@ -1,5 +1,7 @@
 # 12 · Training tricks
 
+**Level: 🔴 Advanced**
+
 > In one sentence: three small tricks that make training more stable — change the learning rate over
 > time, cap giant gradients, and randomly switch off neurons.
 

@@ -1,5 +1,7 @@
 # 13 · Tokenizer
 
+**Level: 🟢 Basic**
+
 > In one sentence: a tokenizer turns text into a list of integer ids (and back), because models only understand numbers.
 
 ## The idea

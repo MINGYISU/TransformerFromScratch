@@ -1,5 +1,7 @@
 # 04 · Gradient descent
 
+**Level: 🟢 Basic**
+
 > In one sentence: to find the minimum of the loss, repeatedly take a small step in the
 > downhill direction that the gradient points to.
 

@@ -1,5 +1,7 @@
 # 01 · Tensors
 
+**Level: 🟢 Basic**
+
 > In one sentence: a tensor is just numbers arranged in a grid — a single number, a list,
 > a table, or a stack of tables — and its **shape** says how many numbers go in each direction.
 

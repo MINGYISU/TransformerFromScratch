@@ -1,5 +1,7 @@
 # 11 · Momentum and Adam
 
+**Level: 🔴 Advanced**
+
 > In one sentence: instead of stepping exactly along today's slope, **momentum** keeps rolling in the
 > direction it has been going, and **Adam** also gives every knob its own step size.
 

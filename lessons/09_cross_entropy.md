@@ -1,5 +1,7 @@
 # 09 · Cross-entropy loss
 
+**Level: 🟢 Basic**
+
 > In one sentence: when a model picks one answer out of many, its loss is $-\log$ of the
 > probability it gave to the correct answer — confident and right is cheap, confident and wrong is expensive.
 
@@ -115,3 +117,5 @@ Cross-entropy is the average surprise of the model when it sees the real answers
 
 ---
 [Course map](../README.md) · Prev: [08](08_softmax.md) · Next: [10 · Metrics](10_metrics.md)
+
+🟢 First read? Skip ahead to [13 · Tokenizer](13_tokenizer.md).

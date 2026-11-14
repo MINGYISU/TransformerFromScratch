@@ -31,6 +31,20 @@ The finished model learns to spell fruit names: give it `ba` and it writes `bana
 | **Check yourself** | a question or two (answers folded) |
 | **Going deeper** | optional extras |
 
+## Levels
+
+Every lesson has a level, so you can choose your path:
+
+| Level | What it means | Lessons |
+|---|---|---|
+| 🟢 **Basic** | the ideas you must know to understand how an LLM works, from text to a trained, generating GPT | 00–09, 13–17, 22–24 |
+| 🟡 **Intermediate** | the machinery to build and train one that works well | 10, 18–21, 25, 27 |
+| 🔴 **Advanced** | techniques that make training better, faster or bigger — optional on a first read | 11, 12, 26, and the advanced track below |
+
+- **First read:** only the 🟢 lessons. They tell the whole story on their own.
+- **Build it yourself:** add the 🟡 lessons.
+- **Make it better:** add the 🔴 lessons.
+
 ## Quick start
 
 ```bash
@@ -47,60 +61,76 @@ To run a lesson's code yourself, paste its `python` blocks in order into `python
 ## Course map
 
 ### Part 0 · The big picture
-| # | Lesson | Idea |
-|---|---|---|
-| 00 | [What is a transformer?](lessons/00_what_is_a_transformer.md) | an LLM guesses the next token; what's inside; how it learns |
+| # | Level | Lesson | Idea |
+|---|---|---|---|
+| 00 | 🟢 | [What is a transformer?](lessons/00_what_is_a_transformer.md) | an LLM guesses the next token; what's inside; how it learns |
 
 ### Part 1 · The math tools
-| # | Lesson | Idea |
-|---|---|---|
-| 01 | [Tensors](lessons/01_tensors.md) | scalars, vectors, matrices; the dot product |
-| 02 | [Gradients](lessons/02_gradients.md) | the slope of $x^2$, and which way is downhill |
-| 03 | [Loss](lessons/03_loss.md) | one number for "how wrong", and why we want its minimum |
-| 04 | [Gradient descent](lessons/04_gradient_descent.md) | walk downhill to the minimum, step by step |
+| # | Level | Lesson | Idea |
+|---|---|---|---|
+| 01 | 🟢 | [Tensors](lessons/01_tensors.md) | scalars, vectors, matrices; the dot product |
+| 02 | 🟢 | [Gradients](lessons/02_gradients.md) | the slope of $x^2$, and which way is downhill |
+| 03 | 🟢 | [Loss](lessons/03_loss.md) | one number for "how wrong", and why we want its minimum |
+| 04 | 🟢 | [Gradient descent](lessons/04_gradient_descent.md) | walk downhill to the minimum, step by step |
 
 ### Part 2 · Neural networks
-| # | Lesson | Idea |
-|---|---|---|
-| 05 | [Linear layer](lessons/05_linear_layer.md) | a neuron = weighted sum + bias |
-| 06 | [Activations](lessons/06_activations.md) | ReLU, GELU: bending straight lines |
-| 07 | [Your first neural network](lessons/07_first_neural_network.md) | a tiny network learns XOR |
+| # | Level | Lesson | Idea |
+|---|---|---|---|
+| 05 | 🟢 | [Linear layer](lessons/05_linear_layer.md) | a neuron = weighted sum + bias |
+| 06 | 🟢 | [Activations](lessons/06_activations.md) | ReLU, GELU: bending straight lines |
+| 07 | 🟢 | [Your first neural network](lessons/07_first_neural_network.md) | a tiny network learns XOR |
 
 ### Part 3 · Choosing among options
-| # | Lesson | Idea |
-|---|---|---|
-| 08 | [Softmax](lessons/08_softmax.md) | scores → probabilities |
-| 09 | [Cross-entropy loss](lessons/09_cross_entropy.md) | $-\log p(\text{correct answer})$ |
-| 10 | [Metrics](lessons/10_metrics.md) | accuracy, perplexity, precision/recall/F1, hit@k, MRR, nDCG |
-| 11 | [Momentum and Adam](lessons/11_momentum_and_adam.md) | smarter steps than plain SGD; AdamW |
-| 12 | [Training tricks](lessons/12_training_tricks.md) | lr warmup/decay, gradient clipping, dropout |
+| # | Level | Lesson | Idea |
+|---|---|---|---|
+| 08 | 🟢 | [Softmax](lessons/08_softmax.md) | scores → probabilities |
+| 09 | 🟢 | [Cross-entropy loss](lessons/09_cross_entropy.md) | $-\log p(\text{correct answer})$ |
+| 10 | 🟡 | [Metrics](lessons/10_metrics.md) | accuracy, perplexity, precision/recall/F1, hit@k, MRR, nDCG |
+| 11 | 🔴 | [Momentum and Adam](lessons/11_momentum_and_adam.md) | smarter steps than plain SGD; AdamW |
+| 12 | 🔴 | [Training tricks](lessons/12_training_tricks.md) | lr warmup/decay, gradient clipping, dropout |
 
 ### Part 4 · Text → numbers
-| # | Lesson | Idea |
-|---|---|---|
-| 13 | [Tokenizer](lessons/13_tokenizer.md) | characters → ids, padding, `<EOS>` |
-| 14 | [Token embeddings](lessons/14_token_embeddings.md) | a learnable vector per token |
-| 15 | [Positional embeddings](lessons/15_positional_embeddings.md) | telling the model *where* each token is |
+| # | Level | Lesson | Idea |
+|---|---|---|---|
+| 13 | 🟢 | [Tokenizer](lessons/13_tokenizer.md) | characters → ids, padding, `<EOS>` |
+| 14 | 🟢 | [Token embeddings](lessons/14_token_embeddings.md) | a learnable vector per token |
+| 15 | 🟢 | [Positional embeddings](lessons/15_positional_embeddings.md) | telling the model *where* each token is |
 
 ### Part 5 · The transformer
-| # | Lesson | Idea |
-|---|---|---|
-| 16 | [Attention](lessons/16_attention.md) | $\text{softmax}(QK^\top / \sqrt{d}) V$ |
-| 17 | [Masks](lessons/17_masks.md) | no peeking at the future |
-| 18 | [Multi-head attention](lessons/18_multi_head_attention.md) | several attentions side by side |
-| 19 | [LayerNorm](lessons/19_layer_norm.md) | keeping numbers in a healthy range |
-| 20 | [Residuals and feed-forward](lessons/20_residual_and_feed_forward.md) | $x + f(x)$ |
-| 21 | [The transformer block](lessons/21_transformer_block.md) | putting 16–20 together |
+| # | Level | Lesson | Idea |
+|---|---|---|---|
+| 16 | 🟢 | [Attention](lessons/16_attention.md) | $\text{softmax}(QK^\top / \sqrt{d}) V$ |
+| 17 | 🟢 | [Masks](lessons/17_masks.md) | no peeking at the future |
+| 18 | 🟡 | [Multi-head attention](lessons/18_multi_head_attention.md) | several attentions side by side |
+| 19 | 🟡 | [LayerNorm](lessons/19_layer_norm.md) | keeping numbers in a healthy range |
+| 20 | 🟡 | [Residuals and feed-forward](lessons/20_residual_and_feed_forward.md) | $x + f(x)$ |
+| 21 | 🟡 | [The transformer block](lessons/21_transformer_block.md) | putting 16–20 together |
 
 ### Part 6 · The language model
-| # | Lesson | Idea |
+| # | Level | Lesson | Idea |
+|---|---|---|---|
+| 22 | 🟢 | [Assembling GPT](lessons/22_assemble_gpt.md) | embeddings → blocks → logits |
+| 23 | 🟢 | [Next-token training](lessons/23_next_token_training.md) | target = input shifted by one |
+| 24 | 🟢 | [Generating text](lessons/24_generation.md) | sample, append, repeat |
+| 25 | 🟡 | [Training it end to end](lessons/25_train_end_to_end.md) | the full loop, reading the log, evaluating, saving and loading |
+| 26 | 🔴 | [Training experiments](lessons/26_training_experiments.md) | batch size, model size, learning rate, tricks: what works best, measured with our metrics |
+| 27 | 🟡 | [MyGPT, the complete picture](lessons/27_mygpt_complete_picture.md) | the famous transformer figure, box by box, mapped to our code |
+
+### Part 7 · Advanced track (planned 🚧)
+| Level | Topic | Idea |
 |---|---|---|
-| 22 | [Assembling GPT](lessons/22_assemble_gpt.md) | embeddings → blocks → logits |
-| 23 | [Next-token training](lessons/23_next_token_training.md) | target = input shifted by one |
-| 24 | [Generating text](lessons/24_generation.md) | sample, append, repeat |
-| 25 | [Training it end to end](lessons/25_train_end_to_end.md) | the full loop, reading the log, evaluating, saving and loading |
-| 26 | [Training experiments](lessons/26_training_experiments.md) | batch size, model size, learning rate, tricks: what works best, measured with our metrics |
-| 27 | [MyGPT, the complete picture](lessons/27_mygpt_complete_picture.md) | the famous transformer figure, box by box, mapped to our code |
+| 🟡 | Sampling strategies | temperature, greedy, top-k, top-p — how to pick the next token |
+| 🟡 | Subword tokenizers (BPE) | merge frequent letter pairs into tokens, like GPT-2 |
+| 🔴 | RMSNorm | a simpler, cheaper LayerNorm, used by LLaMA |
+| 🔴 | Rotary position embeddings (RoPE) | encode position by *rotating* queries and keys |
+| 🔴 | KV cache | don't recompute the past: much faster generation |
+| 🔴 | Gated feed-forward (SwiGLU) | the feed-forward layer of modern LLMs |
+| 🔴 | Grouped-query attention | share keys and values between heads to save memory |
+| 🔴 | Mixture of experts | many feed-forward "experts", each token uses only a few |
+| 🔴 | Fine-tuning and LoRA | adapt a trained model to a new task by training a few small matrices |
+| 🔴 | Instruction tuning and RLHF / DPO | from "continue the text" to "follow instructions" |
+| 🔴 | Multimodal embeddings | images as tokens (patches, like ViT), and a shared text–image space (like CLIP) |
+| 🔴 | Scaling laws | how loss falls with model size, data and compute |
 
 ## Project structure
 

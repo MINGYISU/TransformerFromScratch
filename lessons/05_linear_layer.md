@@ -1,5 +1,7 @@
 # 05 · Linear layer
 
+**Level: 🟢 Basic**
+
 > In one sentence: a neuron multiplies each input by a weight, adds them up, and adds a bias —
 > and a linear layer is many neurons side by side.
 
