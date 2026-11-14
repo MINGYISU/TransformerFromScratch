@@ -140,4 +140,66 @@ ax.plot(steps, [warmup_cosine_lr(s, 3e-3, 100, 2000, 3e-4) for s in steps], colo
 ax.axvspan(0, 100, color='tab:orange', alpha=0.2, label='warmup')
 ax.set_xlabel('training step'); ax.set_ylabel('learning rate'); ax.legend()
 save(fig, '12_lr_schedule.png')
+# 26: MyGPT, bottom to top, with the code that implements each box
+from matplotlib.patches import FancyBboxPatch, Rectangle
+fig, ax = plt.subplots(figsize=(12.5, 13.5))
+ax.set_xlim(0, 13); ax.set_ylim(0, 14); ax.axis('off')
+CX, W = 4.4, 4.2
+
+def box(cy, text, color, cx=CX, w=W, h=0.75):
+    ax.add_patch(FancyBboxPatch((cx - w / 2, cy - h / 2), w, h, boxstyle='round,pad=0.05,rounding_size=0.15',
+                                facecolor=color, edgecolor='black', lw=1.2, zorder=2))
+    ax.text(cx, cy, text, ha='center', va='center', fontsize=11, zorder=3)
+
+def arrow(x0, y0, x1, y1):
+    ax.annotate('', (x1, y1), (x0, y0), arrowprops=dict(arrowstyle='->', lw=1.4, shrinkA=0, shrinkB=0), zorder=1)
+
+def plus(cy, cx=CX):
+    ax.add_patch(plt.Circle((cx, cy), 0.22, facecolor='white', edgecolor='black', lw=1.2, zorder=3))
+    ax.text(cx, cy, '+', ha='center', va='center', fontsize=14, zorder=4)
+
+def note(cy, text):
+    ax.text(7.4, cy, text, ha='left', va='center', fontsize=10, family='monospace', color='#333333')
+
+def residual(y_from, y_to):
+    x = CX - W / 2 - 0.4
+    ax.plot([CX, x, x], [y_from, y_from, y_to], color='black', lw=1.2, zorder=1)
+    arrow(x, y_to, CX - 0.22, y_to)
+
+box(0.6, 'input ids   [B, T]', '#eeeeee')
+note(0.6, 'tokenizer.tokenize(texts)            · 13')
+arrow(CX - 1.1, 0.98, CX - 1.1, 1.5); arrow(CX + 1.1, 0.98, CX + 1.1, 1.5)
+box(1.9, 'token\nembedding', '#f6c7c7', cx=CX - 1.1, w=2.0)
+box(1.9, 'positional embedding\nof positions 0…T−1', '#f6c7c7', cx=CX + 1.1, w=2.0)
+note(1.9, 'MyGPT.encode:\ntoken_embed[ids] + pos_embed[:T]     · 14, 15')
+plus(2.9); arrow(CX - 1.1, 2.3, CX - 0.18, 2.77); arrow(CX + 1.1, 2.3, CX + 0.18, 2.77)
+arrow(CX, 3.12, CX, 3.92)
+
+ax.add_patch(Rectangle((CX - W / 2 - 0.8, 3.55), W + 1.6, 6.35, facecolor='#f4f4f4', edgecolor='gray', lw=1.2, ls='--', zorder=0))
+ax.text(CX - W / 2 - 0.95, 6.7, 'TransformerBlock\n× num_layers\n(self.blocks)', ha='right', va='center', fontsize=11, fontweight='bold')
+box(4.3, 'LayerNorm  (ln1)', '#fbeeb8')
+note(4.3, 'LayerNorm → layer_norm()             · 19')
+arrow(CX, 4.68, CX, 5.05)
+box(5.5, 'masked multi-head\nself-attention  (attn)', '#fbd5a5', h=0.9)
+note(5.5, 'MultiHeadSelfAttention → mha()\n  → attention() with causal mask     · 16–18')
+arrow(CX, 5.95, CX, 6.48); plus(6.7); residual(3.92, 6.7)
+note(6.7, 'x = x + attn_out    (residual)        · 20')
+arrow(CX, 6.92, CX, 7.32)
+box(7.7, 'LayerNorm  (ln2)', '#fbeeb8')
+arrow(CX, 8.08, CX, 8.3)
+box(8.75, 'feed-forward  (mlp)\nLinear → GELU → Linear', '#c9dcf2', h=0.9)
+note(8.75, 'FeedForward: fc1 → gelu() → fc2      · 05, 06, 20')
+arrow(CX, 9.2, CX, 9.38); plus(9.6); residual(7.12, 9.6)
+note(9.6, 'x = x + mlp_out     (residual)        · 20')
+arrow(CX, 9.82, CX, 10.42)
+
+box(10.8, 'final LayerNorm  (ln_f)', '#fbeeb8')
+note(10.8, 'self.ln_f(x)                         · 19, 22')
+arrow(CX, 11.18, CX, 11.55)
+box(12.0, 'linear to vocabulary:  x @ token_embedᵀ\n→ logits   [B, T, V]', '#d7ecd0', h=0.9)
+note(12.0, 'MyGPT.forward (weight tying)         · 22')
+arrow(CX, 12.45, CX, 12.83)
+box(13.2, 'softmax → next-token probabilities', '#d7ecd0')
+note(13.2, 'softmax() in MyGPT.generate          · 08, 24')
+save(fig, '26_mygpt.png')
 print('figures written to', OUT)

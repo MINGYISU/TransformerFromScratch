@@ -99,6 +99,7 @@ To run a lesson's code yourself, paste its `python` blocks in order into `python
 | 23 | [Next-token training](lessons/23_next_token_training.md) | target = input shifted by one |
 | 24 | [Generating text](lessons/24_generation.md) | sample, append, repeat |
 | 25 | [Training it end to end](lessons/25_train_end_to_end.md) | the full loop, reading the log, evaluating, saving and loading |
+| 26 | [MyGPT, the complete picture](lessons/26_mygpt_complete_picture.md) | the famous transformer figure, box by box, mapped to our code |
 
 ## Project structure
 

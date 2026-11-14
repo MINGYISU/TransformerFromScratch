@@ -123,4 +123,4 @@ Try it yourself: change `FRUITS` in `train.py` to your own word list, or increas
 </details>
 
 ---
-[Course map](../README.md) · Prev: [24](24_generation.md)
+[Course map](../README.md) · Prev: [24](24_generation.md) · Next: [26 · MyGPT, the complete picture](26_mygpt_complete_picture.md)
