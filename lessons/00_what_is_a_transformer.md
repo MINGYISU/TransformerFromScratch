@@ -74,7 +74,8 @@ the model discovers them by itself, just from being corrected.
 | Text → tokens → vectors | 13–15 |
 | Attention and the transformer block | 16–21 |
 | The full GPT: training it and generating text | 22–25 |
-| The famous transformer diagram, mapped onto our code | 26 |
+| Experiments: which training settings work best | 26 |
+| The famous transformer diagram, mapped onto our code | 27 |
 
 ## Check yourself
 

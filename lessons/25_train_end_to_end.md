@@ -102,12 +102,14 @@ From the command line, the same thing is: `python -m models.example.train` then 
 
 ## Check yourself
 
-1. During training the printed accuracy jumps around (0.88, 0.97, 0.90...) even late in training. Why?
+1. The accuracy printed during training moves up and down from step to step — and can even go above 0.91,
+   although on all fruits together the model ends at 0.91. How is that possible?
 
 <details><summary>Answer</summary>
 
-Each step measures a different random batch of only 8 words, and some batches contain more of the "uncertain" letters
-than others. That's why we also evaluate on all fruits at once.
+Each printed number measures only one random batch of 8 words, and some batches contain fewer of the truly "uncertain"
+letters (like the one after `p`) than others. On all fruits together, 0.91 is the best any model can reach — see
+[lesson 26](26_training_experiments.md). That's why we also evaluate on all fruits at once.
 </details>
 
 <details><summary>Going deeper: where to go from here</summary>
@@ -123,4 +125,4 @@ Try it yourself: change `FRUITS` in `train.py` to your own word list, or increas
 </details>
 
 ---
-[Course map](../README.md) · Prev: [24](24_generation.md) · Next: [26 · MyGPT, the complete picture](26_mygpt_complete_picture.md)
+[Course map](../README.md) · Prev: [24](24_generation.md) · Next: [26 · Training experiments](26_training_experiments.md)

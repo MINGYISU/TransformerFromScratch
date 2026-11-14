@@ -99,3 +99,25 @@ def test_xor_network_learns():
     from models.mlp.xor import train, X, Y
     model = train(verbose=False)
     assert torch.allclose(model(X).detach(), Y, atol=0.1)
+
+def test_train_options_and_evaluate():
+    from models.example.train import train
+    for options in (dict(), dict(optimizer='sgd', max_lr=0.05, clip=None, schedule=False)):
+        model = train(steps=3, eval_every=1, verbose=False, save_dir=None, embed_dim=16, **options)
+        assert [h['step'] for h in model.history] == [0, 1, 2]
+        result = model.history[-1]
+        assert set(result) >= {'loss', 'perplexity', 'accuracy', 'hit@3', 'mrr', 'spelling'}
+        assert 0 <= result['accuracy'] <= 1 and 0 <= result['spelling'] <= 1
+        assert result['perplexity'] == pytest.approx(math.exp(result['loss']))
+
+def test_greedy_generation_is_deterministic():
+    from models.example.model import MyGPT
+    model = MyGPT(max_seq_length=100, embed_dim=16, num_layers=1, num_heads=2)
+    ids, _ = model.tokenizer.tokenize(['ba', 'gr'], add_eos=False)
+    assert torch.equal(model.generate(ids, max_new_tokens=5, greedy=True), model.generate(ids, max_new_tokens=5, greedy=True))
+
+def test_best_possible_scores():
+    from models.example.experiments import best_possible
+    best = best_possible()
+    assert best['accuracy'] == pytest.approx(0.91)
+    assert best['loss'] == pytest.approx(0.1439, abs=1e-4)

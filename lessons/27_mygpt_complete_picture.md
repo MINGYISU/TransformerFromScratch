@@ -1,4 +1,4 @@
-# 26 · MyGPT, the complete picture
+# 27 · MyGPT, the complete picture
 
 > In one sentence: our `MyGPT` is the right-hand half of the famous transformer diagram — every box
 > in that picture is a few lines of code you've already written.
@@ -28,7 +28,7 @@ encoder goes away, and with it the middle attention that looks at the encoder. W
 
 Here is `MyGPT`, drawn the same way (bottom to top), with the code that implements each box and the lesson that explains it:
 
-![MyGPT architecture with code references](figures/26_mygpt.png)
+![MyGPT architecture with code references](figures/27_mygpt.png)
 
 | Box in Figure 1 (right tower) | In `MyGPT` | Code | Lesson | Same or different? |
 |---|---|---|---|---|
@@ -157,4 +157,4 @@ The picture you now understand is still the picture.
 </details>
 
 ---
-[Course map](../README.md) · Prev: [25](25_train_end_to_end.md)
+[Course map](../README.md) · Prev: [26](26_training_experiments.md)

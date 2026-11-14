@@ -95,13 +95,15 @@ class MyGPT(Module):
             self, 
             input_ids: Union[torch.Tensor, List[List[int]]], 
             max_new_tokens: int=30, 
-            eos_token_id: int=None
+            eos_token_id: int=None,
+            greedy: bool=False,
     ) -> torch.Tensor:
         """Auto-regressive generation
         Args:
             input_ids: torch.Tensor of shape [batch size, sequence length]
             max_new_tokens: int, number of tokens to generate
             eos_token_id: int, token ID for end-of-sequence (optional)
+            greedy: bool, always pick the most likely token instead of sampling (same output every time)
         Returns:
             generated_ids: torch.Tensor of shape [batch size, sequence length + max_new_tokens]
         """
@@ -124,7 +126,10 @@ class MyGPT(Module):
 
             # sample from the distribution, ie, get next token id
             probs = softmax(logits)  # [B, V]
-            next_token_ids = torch.multinomial(probs, num_samples=1)  # [B, 1]
+            if greedy:
+                next_token_ids = probs.argmax(dim=-1, keepdim=True)  # [B, 1]
+            else:
+                next_token_ids = torch.multinomial(probs, num_samples=1)  # [B, 1]
 
             # sequences that already ended just get padding (id 0)
             next_token_ids[finished] = 0

@@ -140,7 +140,7 @@ ax.plot(steps, [warmup_cosine_lr(s, 3e-3, 100, 2000, 3e-4) for s in steps], colo
 ax.axvspan(0, 100, color='tab:orange', alpha=0.2, label='warmup')
 ax.set_xlabel('training step'); ax.set_ylabel('learning rate'); ax.legend()
 save(fig, '12_lr_schedule.png')
-# 26: MyGPT, bottom to top, with the code that implements each box
+# 27: MyGPT, bottom to top, with the code that implements each box
 from matplotlib.patches import FancyBboxPatch, Rectangle
 fig, ax = plt.subplots(figsize=(12.5, 13.5))
 ax.set_xlim(0, 13); ax.set_ylim(0, 14); ax.axis('off')
@@ -201,5 +201,21 @@ note(12.0, 'MyGPT.forward (weight tying)         · 22')
 arrow(CX, 12.45, CX, 12.83)
 box(13.2, 'softmax → next-token probabilities', '#d7ecd0')
 note(13.2, 'softmax() in MyGPT.generate          · 08, 24')
-save(fig, '26_mygpt.png')
+save(fig, '27_mygpt.png')
+# 26: training experiments (results from: python -m models.example.experiments)
+import json
+results = json.loads((OUT.parent.parent / 'models/example/experiment_results.json').read_text())
+floor = results['best_possible']['loss']
+fig, axes = plt.subplots(2, 4, figsize=(20, 8.5), sharey=True)
+axes.flat[-1].axis('off')
+for ax, (name, runs) in zip(axes.flat, results['experiments'].items()):
+    for r in runs:
+        short = r['label'].replace('batch_size=32, embed_dim=64, num_layers=1, max_lr=0.01', 'winners combined')
+        ax.plot(r['curve_steps'], r['curve_loss'], lw=2, label=short)
+    ax.axhline(floor, color='black', ls='--', lw=1, label=f'best possible ({floor:.3f})')
+    ax.set_yscale('log'); ax.set_title(name); ax.set_xlabel('training step'); ax.legend(fontsize=8)
+for ax in axes[:, 0]:
+    ax.set_ylabel('loss on all fruits (log scale)')
+fig.suptitle(f"Loss during training, mean of {len(results['seeds'])} seeds — change one setting at a time", fontsize=14)
+save(fig, '26_experiments.png')
 print('figures written to', OUT)
